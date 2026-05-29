@@ -28,19 +28,23 @@ jobs:
 
       - name: "Test: Install shellcheck"
         run: |
+          set -euo pipefail
           sudo apt-get update
           sudo apt-get install -y shellcheck
 
       - name: "Test: Remove Python yq and keep using Go yq"
         run: |
+          set -euo pipefail
           python -m pip uninstall -y yq
 
       - name: "Test: Install lint deps"
         run: |
+          set -euo pipefail
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
 
       - name: "Test: Run scripts/lint.sh"
         run: |
+          set -euo pipefail
           chmod +x scripts/*.sh
           scripts/lint.sh

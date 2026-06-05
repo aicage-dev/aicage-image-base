@@ -6,19 +6,15 @@ name: GHCR Cleanup
     - cron: "23 3 * * 3"
   workflow_dispatch:
     inputs:
-      RETENTION_DAYS:
+      older-than-days:
         description: "Retention window in days for cleanup"
         type: number
         default: 30
-      RELEASE_TAG_KEEP_COUNT:
-        description: "How many latest release tags to keep"
-        type: number
-        default: 3
-      dry_run:
+      dry-run:
         description: "Run in dry-run mode (recommended first)"
         type: boolean
         default: true
-      log_level:
+      log-level:
         description: "Action log level"
         type: choice
         options:
@@ -31,8 +27,6 @@ name: GHCR Cleanup
 env:
   # Repo-specific high-level knobs
   PACKAGE_NAME: aicage-image-base
-  RETENTION_DAYS: ${{ github.event_name == 'workflow_dispatch' && inputs.RETENTION_DAYS || 30 }}
-  RELEASE_TAG_KEEP_COUNT: ${{ github.event_name == 'workflow_dispatch' && inputs.RELEASE_TAG_KEEP_COUNT || 3 }}
 
 permissions:
   contents: read
@@ -44,8 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       package_name: ${{ steps.config.outputs.package_name }}
-      retention_days: ${{ steps.config.outputs.retention_days }}
-      keep_tags_regex: ${{ steps.regex.outputs.keep_tags_regex }}
+      exclude_tags_regex: ${{ steps.regex.outputs.exclude_tags_regex }}
       release_list: ${{ steps.regex.outputs.release_list }}
       base_list: ${{ steps.regex.outputs.base_list }}
     steps:
@@ -56,7 +49,6 @@ jobs:
           set -euo pipefail
           {
             echo "package_name=${PACKAGE_NAME}"
-            echo "retention_days=${RETENTION_DAYS}"
           } >> "${GITHUB_OUTPUT}"
 
       - name: Checkout
@@ -64,19 +56,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Build base/release keep-regex
+      - name: Build base/release exclude-tags-regex
         id: regex
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-
-          N="${RELEASE_TAG_KEEP_COUNT}"
-          if ! [[ "${N}" =~ ^[0-9]+$ ]] || (( N < 1 )); then
-            echo "RELEASE_TAG_KEEP_COUNT must be an integer >= 1, got: ${N}" >&2
-            exit 1
-          fi
 
           mapfile -t BASES < <(find bases -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort)
           if (( ${#BASES[@]} == 0 )); then
@@ -99,12 +85,11 @@ jobs:
           mapfile -t RELEASES < <(
             printf '%s' "${RELEASES_JSON}" \
               | jq -r '.[] | select(.draft | not) | .tag_name' \
-              | sort -V -r \
-              | head -n "${N}"
+              | sort -V -r
           )
 
           if (( ${#RELEASES[@]} == 0 )); then
-            echo "No GitHub releases found. RELEASE_LIST must be non-empty." >&2
+            echo "No release tags found. This must be non-empty." >&2
             exit 1
           fi
 
@@ -122,12 +107,12 @@ jobs:
 
           BASE_LIST="$(IFS='|'; echo "${ESCAPED_BASES[*]}")"
           RELEASE_LIST="$(IFS='|'; echo "${ESCAPED_RELEASES[*]}")"
-          KEEP_TAGS_REGEX="^(${BASE_LIST})(-(${RELEASE_LIST}))?(-amd64|-arm64)?$"
+          EXCLUDE_TAGS_REGEX="^(${BASE_LIST})(-(${RELEASE_LIST}))?(-amd64|-arm64)?$"
 
           {
             echo "base_list=${BASE_LIST}"
             echo "release_list=${RELEASE_LIST}"
-            echo "keep_tags_regex=${KEEP_TAGS_REGEX}"
+            echo "exclude_tags_regex=${EXCLUDE_TAGS_REGEX}"
           } | tee /dev/stderr >> "${GITHUB_OUTPUT}"
 
   ghcr-cleanup:
@@ -135,17 +120,18 @@ jobs:
     needs: prepare-retention-regex
     runs-on: ubuntu-latest
     steps:
-      - name: Cleanup candidate images
-        uses: dataaxiom/ghcr-cleanup-action@f092b48ba3b604b2a83690dc4b2bbb3392e1045f  # v1.2.1
+      - name: Cleanup old images
+        uses: gh-workflow/ghcr-manager@169eb04dce3b2b4d93bfdfe5a6b39b6f7a05f1d1  # v1.0.3
         with:
+          command: cleanup
           token: ${{ secrets.GHCR_CLEANUP_PAT != '' && secrets.GHCR_CLEANUP_PAT || github.token }}
           owner: ${{ github.repository_owner }}
-          repository: ${{ github.event.repository.name }}
           package: ${{ needs.prepare-retention-regex.outputs.package_name }}
+          upload-artifacts: true
           use-regex: true
           delete-tags: '.*'
-          exclude-tags: ${{ needs.prepare-retention-regex.outputs.keep_tags_regex }}
-          older-than: ${{ needs.prepare-retention-regex.outputs.retention_days }} days
+          exclude-tags: ${{ needs.prepare-retention-regex.outputs.exclude_tags_regex }}
+          older-than: ${{ github.event_name == 'workflow_dispatch' && inputs.older-than-days || 30 }} days
           delete-untagged: true
-          dry-run: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || false }}
-          log-level: ${{ github.event_name == 'workflow_dispatch' && inputs.log_level || 'info' }}
+          dry-run: ${{ github.event_name == 'workflow_dispatch' && inputs.dry-run || false }}
+          log-level: ${{ github.event_name == 'workflow_dispatch' && inputs.log-level || 'info' }}

@@ -16,6 +16,11 @@ elif command -v apk >/dev/null 2>&1; then
     mariadb-client \
     postgresql-client \
     sqlite
+elif command -v pacman >/dev/null 2>&1; then
+  pacman -S --noconfirm --needed \
+    mariadb-clients \
+    postgresql \
+    sqlite
 else
   echo "Unsupported package manager for database client installation" >&2
   exit 1

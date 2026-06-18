@@ -1,12 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if command -v rustc >/dev/null 2>&1; then
-  exit 0
-fi
-
 export RUSTUP_HOME=/usr/local/rustup
 export CARGO_HOME=/usr/local/cargo
+export PATH="${CARGO_HOME}/bin:${PATH}"
 
 # add retry and other params to reduce failure in pipelines
 curl_wrapper() {
@@ -18,9 +15,21 @@ curl_wrapper() {
     "$@"
 }
 
-curl_wrapper https://sh.rustup.rs | sh -s -- -y --profile minimal --no-modify-path
+if ! command -v rustup >/dev/null 2>&1; then
+  curl_wrapper https://sh.rustup.rs | sh -s -- -y --profile minimal --no-modify-path
+fi
 
-PATH="${CARGO_HOME}/bin:${PATH}" rustup component add rustfmt clippy
+rustup component add rustfmt clippy
+
+musl_target="$(uname -m)-unknown-linux-musl"
+rustup target add "${musl_target}"
+
+cargo_config="${CARGO_HOME}/config.toml"
+install -d "${CARGO_HOME}"
+touch "${cargo_config}"
+if command -v musl-gcc >/dev/null 2>&1 && ! grep -Fq "[target.${musl_target}]" "${cargo_config}"; then
+  printf '\n[target.%s]\nlinker = "musl-gcc"\n' "${musl_target}" >> "${cargo_config}"
+fi
 
 for bin in "${CARGO_HOME}/bin/"*; do
   ln -sf "${bin}" "/usr/local/bin/$(basename "${bin}")"

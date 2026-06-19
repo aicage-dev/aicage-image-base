@@ -53,5 +53,6 @@ curl_wrapper https://raw.githubusercontent.com/rust-lang/rustup/master/LICENSE-M
   -o /usr/share/licenses/rustup/LICENSE-MIT
 
 cat > /etc/profile.d/rust.sh <<'RUST'
-export PATH="$HOME/.cargo/bin:$PATH"
+export RUSTUP_HOME=/usr/local/rustup
+export PATH="/usr/local/cargo/bin:$HOME/.cargo/bin:$PATH"
 RUST

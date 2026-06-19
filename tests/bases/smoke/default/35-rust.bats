@@ -18,3 +18,19 @@
     '
   [ "$status" -eq 0 ]
 }
+
+@test "rust shell environment configured" {
+  run docker run --rm \
+    --env AICAGE_WORKSPACE=/workspace \
+    "${AICAGE_IMAGE_BASE_IMAGE}" \
+    -lc '
+      set -euo pipefail
+      test "${RUSTUP_HOME}" = "/usr/local/rustup"
+      [[ ":${PATH}:" == *":/usr/local/cargo/bin:"* ]]
+      [[ ":${PATH}:" == *":${HOME}/.cargo/bin:"* ]]
+      rustup show active-toolchain >/dev/null
+      cargo -V >/dev/null
+      rustc -V >/dev/null
+    '
+  [ "$status" -eq 0 ]
+}

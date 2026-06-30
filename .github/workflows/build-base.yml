@@ -47,21 +47,39 @@ permissions:
   id-token: write
   actions: read
 
+env:
+  RUNNER_AMD64: ubuntu-latest
+  RUNNER_ARM64: ubuntu-24.04-arm
+
 jobs:
+  prepare:
+    name: "${{ inputs.base }}: Prepare architecture matrix"
+    runs-on: ubuntu-latest
+    env:
+      BASE_ALIAS: ${{ inputs.base }}
+      ROOT_DIR: ${{ github.workspace }}
+    outputs:
+      BUILD_MATRIX: ${{ steps.matrix.outputs.BUILD_MATRIX }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          ref: ${{ inputs.git_ref || github.ref }}
+
+      - name: Resolve supported architectures
+        id: matrix
+        run: |
+          set -euo pipefail
+          matrix_json="$(scripts/ci/base-build-matrix.sh)"
+          printf 'BUILD_MATRIX=%s\n' "${matrix_json}" >> "${GITHUB_OUTPUT}"
 
   build:
-    name: "${{ matrix.arch }}: Build and test image"
+    name: "${{ inputs.base }}/${{ matrix.arch }}: Build and test image"
+    needs: prepare
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - arch: amd64
-            platform: linux/amd64
-            runner: ubuntu-latest
-          - arch: arm64
-            platform: linux/arm64
-            runner: ubuntu-24.04-arm
+      matrix: ${{ fromJson(needs.prepare.outputs.BUILD_MATRIX) }}
     env:
       PLATFORM: ${{ matrix.platform }}
       ARCH_SUFFIX: ${{ matrix.arch }}
@@ -236,6 +254,27 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Use multi-arch publish action
+        id: platform-digests
+        run: |
+          set -euo pipefail
+          platform_digests_file="$(mktemp)"
+          if [[ -n "${{ needs.build.outputs.INDEX_DIGEST_amd64 }}" ]]; then
+            printf '%s\n' "linux/amd64=${{ needs.build.outputs.INDEX_DIGEST_amd64 }}" >> "${platform_digests_file}"
+          fi
+          if [[ -n "${{ needs.build.outputs.INDEX_DIGEST_arm64 }}" ]]; then
+            printf '%s\n' "linux/arm64=${{ needs.build.outputs.INDEX_DIGEST_arm64 }}" >> "${platform_digests_file}"
+          fi
+          if [[ ! -s "${platform_digests_file}" ]]; then
+            echo "No platform digests produced for ${{ inputs.base }}" >&2
+            exit 1
+          fi
+          {
+            echo 'PLATFORM_DIGESTS<<EOF'
+            cat "${platform_digests_file}"
+            echo 'EOF'
+          } >> "${GITHUB_OUTPUT}"
+
+      - name: Use multi-arch publish action
         id: publish
         uses: gh-workflow/multiarch-image-publish@c5eac5dd8f7ed6b39fffc6e2c2242966b4917260  # 0.2.1
         with:
@@ -243,9 +282,7 @@ jobs:
           tags: |
             ${{ inputs.base }}-${{ inputs.aicage_version }}
             ${{ inputs.base }}
-          platform_digests: |
-            linux/amd64=${{ needs.build.outputs.INDEX_DIGEST_amd64 }}
-            linux/arm64=${{ needs.build.outputs.INDEX_DIGEST_arm64 }}
+          platform_digests: ${{ steps.platform-digests.outputs.PLATFORM_DIGESTS }}
           annotations: |
             org.opencontainers.image.title=aicage-image-base
             org.opencontainers.image.description=Base image for aicage (${{ inputs.base }})

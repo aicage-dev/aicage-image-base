@@ -62,3 +62,19 @@ get_base_build_field() {
   local field="$2"
   _read_yaml_field "${alias}" "${field}" base-build.yml
 }
+
+get_base_list_field() {
+  local alias="$1"
+  local field="$2"
+  local definition_file="${BASE_DEFINITIONS_DIR}/${alias}/base.yml"
+
+  [[ -f "${definition_file}" ]] || _die "Missing base.yml for '${alias}'"
+
+  yq -r ".${field} // [] | .[]" "${definition_file}" \
+    || _die "Failed to read ${field} from ${definition_file}"
+}
+
+get_base_architectures() {
+  local alias="$1"
+  get_base_list_field "${alias}" architectures
+}

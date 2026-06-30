@@ -7,8 +7,9 @@
     -c '
       set -euo pipefail
       command -v sqlite3
-      command -v psql
-      command -v mysql >/dev/null || command -v mariadb >/dev/null
+      sqlite3 :memory: "select '\''ok-sqlite'\'';" | grep -qx ok-sqlite
+      psql --version >/dev/null
+      mysql --version >/dev/null || mariadb --version >/dev/null
     '
   [ "$status" -eq 0 ]
 }

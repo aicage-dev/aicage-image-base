@@ -7,6 +7,7 @@
     -c '
       set -euo pipefail
       command -v gosu
+      gosu nobody sh -c '\''id -un'\'' | grep -qx nobody
     '
   [ "$status" -eq 0 ]
 }

@@ -10,6 +10,9 @@
       command -v npm
       command -v corepack
       command -v xdg-open
+      node -e '\''console.log("ok-node")'\'' | grep -qx ok-node
+      npm --version >/dev/null
+      corepack --version >/dev/null
     '
   [ "$status" -eq 0 ]
 }

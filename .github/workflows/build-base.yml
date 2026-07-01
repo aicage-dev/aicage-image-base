@@ -253,7 +253,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Use multi-arch publish action
+      - name: Prepare digests for multi-arch publish action
         id: platform-digests
         run: |
           set -euo pipefail

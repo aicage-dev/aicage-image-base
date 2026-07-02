@@ -8,7 +8,6 @@
     --env AICAGE_GID=2345 \
     --env AICAGE_HOST_USER=demo \
     --env AICAGE_HOME=/home/demo \
-    --env BASE_ALIAS="${BASE_ALIAS}" \
     "${AICAGE_IMAGE_BASE_IMAGE}" \
     -c '
       set -euo pipefail
@@ -25,26 +24,20 @@
         find "${dir}" -mindepth 1 "$@" | wc -l
       }
 
-      case "${BASE_ALIAS}" in
-        alpine)
-          [[ "$(count_files /var/cache/apk -type f)" -eq 0 ]]
-          ;;
-        arch)
-          [[ "$(count_files /var/cache/pacman/pkg -type f)" -eq 0 ]]
-          [[ "$(count_files /var/lib/pacman/sync -type f)" -eq 0 ]]
-          ;;
-        debian|ubuntu)
-          [[ "$(count_files /var/cache/apt/archives -type f ! -name lock)" -eq 0 ]]
-          [[ "$(count_files /var/lib/apt/lists -type f ! -name lock)" -eq 0 ]]
-          ;;
-        fedora)
-          [[ "$(count_files /var/cache/dnf -type f)" -eq 0 ]]
-          ;;
-        *)
-          echo "unsupported base alias: ${BASE_ALIAS}" >&2
-          exit 1
-          ;;
-      esac
+      if command -v apk >/dev/null 2>&1; then
+        [[ "$(count_files /var/cache/apk -type f)" -eq 0 ]]
+      elif command -v pacman >/dev/null 2>&1; then
+        [[ "$(count_files /var/cache/pacman/pkg -type f)" -eq 0 ]]
+        [[ "$(count_files /var/lib/pacman/sync -type f)" -eq 0 ]]
+      elif command -v apt-get >/dev/null 2>&1; then
+        [[ "$(count_files /var/cache/apt/archives -type f ! -name lock)" -eq 0 ]]
+        [[ "$(count_files /var/lib/apt/lists -type f ! -name lock)" -eq 0 ]]
+      elif command -v dnf >/dev/null 2>&1; then
+        [[ "$(count_files /var/cache/dnf -type f)" -eq 0 ]]
+      else
+        echo "unsupported package manager" >&2
+        exit 1
+      fi
     '
   [ "$status" -eq 0 ]
 }

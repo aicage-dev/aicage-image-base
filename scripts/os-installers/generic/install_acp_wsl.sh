@@ -16,7 +16,7 @@ curl -fsSL \
   --retry-all-errors \
   --retry-delay 2 \
   --max-time 600 \
-  "https://github.com/aicage/acp-wsl/releases/latest/download/acp-wsl-linux-${acp_wsl_arch}" \
+  "https://github.com/aicage-dev/acp-wsl/releases/latest/download/acp-wsl-linux-${acp_wsl_arch}" \
   -o /usr/local/bin/acp-wsl
 
 chmod 755 /usr/local/bin/acp-wsl

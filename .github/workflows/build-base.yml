@@ -209,7 +209,7 @@ jobs:
             ' >/dev/null
 
       - name: "Test: Setup BATS testing framework"
-        uses: Wuodan/bats-action@36b6362559b4d954eed2e53f675e3eef2703eb4f  # 4.0.1-alpha01
+        uses: Wuodan/bats-action@927ac5742be4f302fde95be2b945428228cfc69f  # 4.0.1-alpha02
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 

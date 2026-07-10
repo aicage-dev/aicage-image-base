@@ -94,6 +94,34 @@ cleanup_mount_dir() {
   [ "$status" -eq 0 ]
 }
 
+@test "reduced contract supports non-linux home mirroring directly" {
+  host_dir="$(mktemp -d)"
+  trap 'cleanup_mount_dir "${host_dir}"' RETURN
+  chmod 755 "${host_dir}"
+  mkdir -p "${host_dir}/dir-a"
+  chmod 755 "${host_dir}/dir-a"
+  printf 'dir-data\n' >"${host_dir}/dir-a/config"
+  chmod 644 "${host_dir}/dir-a/config"
+
+  run docker run --rm \
+    --env AICAGE_WORKSPACE=/workspace \
+    -v "${host_dir}/dir-a:/mnt/d/Users/hoster/.aicage-test-dir:ro" \
+    --env AICAGE_UID=0 \
+    --env AICAGE_GID=0 \
+    --env AICAGE_USERNAME=root \
+    --env AICAGE_HOME=/root \
+    --env AICAGE_MOUNT_HOME=/mnt/d/Users/hoster \
+    "${AICAGE_IMAGE_BASE_IMAGE}" \
+    -c '
+      set -euo pipefail
+      [[ -L /root/.aicage-test-dir ]]
+      [[ $(readlink -f /root/.aicage-test-dir) == "/mnt/d/Users/hoster/.aicage-test-dir" ]]
+      cat /root/.aicage-test-dir/config
+    '
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"dir-data"* ]]
+}
+
 @test "home dir mounts are directly available in AICAGE_HOME" {
   host_dir="$(mktemp -d)"
   trap 'cleanup_mount_dir "${host_dir}"' RETURN

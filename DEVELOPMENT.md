@@ -73,7 +73,7 @@ scripts/debug/build-all.sh
 
 ```bash
 # Run smoke tests for all bases
-scripts/test-all.sh
+scripts/debug/test-all.sh
 ```
 
 Smoke suites live in `tests/bases/smoke/` (including subfolders); run individual files with

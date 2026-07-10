@@ -13,7 +13,7 @@ use `DEVELOPMENT.md` for full build/test instructions.
 
 ## Testing
 
-- Run `scripts/test-all.sh` after changing base definitions, installers, or Docker build steps.
+- Run `scripts/debug/test-all.sh` after changing base definitions, installers, or Docker build steps.
 - If tests cannot be executed, note why and which platforms/bases are affected.
 
 ## Adding or updating bases

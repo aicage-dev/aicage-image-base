@@ -43,7 +43,7 @@ while [[ $# -gt 0 ]]; do
       BASE_ALIAS="$2"
       shift 2
       ;;
-    -h|--help)
+    -h | --help)
       usage
       ;;
     *)
@@ -52,8 +52,14 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-[[ -n "${IMAGE_REF}" ]] || { log "--image is required"; usage; }
-[[ -n "${BASE_ALIAS}" ]] || { log "--base is required"; usage; }
+[[ -n "${IMAGE_REF}" ]] || {
+  log "--image is required"
+  usage
+}
+[[ -n "${BASE_ALIAS}" ]] || {
+  log "--base is required"
+  usage
+}
 
 if ! TEST_SUITE="$(get_base_build_field "${BASE_ALIAS}" test_suite)"; then
   TEST_SUITE="default"

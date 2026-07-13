@@ -88,6 +88,7 @@ jobs:
           APPLY_FIXES: ${{ env.FIX_MODE != 'none' && 'all' || 'none' }}
           APPLY_FIXES_EVENT: ${{ github.event_name }}
           APPLY_FIXES_MODE: pull_request
+          REPORT_OUTPUT_FOLDER: ${{ runner.temp }}/megalinter-reports
           # new non-root user test
           MEGALINTER_UID: ${{ env.MEGALINTER_UID }}
           MEGALINTER_GID: ${{ env.MEGALINTER_GID }}
@@ -95,10 +96,10 @@ jobs:
 
       - name: "Debug: Print info about megalinter-reports folder"
         run: |
-          if [[ -e megalinter-reports ]]; then
-            ls -alh megalinter-reports
+          if [[ -e ${{ runner.temp }}/megalinter-reports ]]; then
+            ls -alh ${{ runner.temp }}/megalinter-reports
           else
-            echo "No 'megalinter-reports' found" 1>&2
+            echo "No '${{ runner.temp }}/megalinter-reports' found" 1>&2
           fi
           # reset .github or this needs PAT
           # refusing to allow a GitHub App to create or update workflow `.github/<path>` without `workflows` permission
@@ -111,7 +112,7 @@ jobs:
           name: MegaLinter reports
           include-hidden-files: "true"
           path: |
-            megalinter-reports
+            ${{ runner.temp }}/megalinter-reports
             mega-linter.log
 
       - name: Create Pull Request with applied fixes
@@ -125,7 +126,7 @@ jobs:
           token: ${{ secrets.PAT || github.token }}
           commit-message: "[MegaLinter] Apply linters automatic fixes"
           title: "[MegaLinter] Apply linters automatic fixes"
-          body-path: megalinter-reports/megalinter-report.md
+          body-path: ${{ runner.temp }}/megalinter-reports/megalinter-report.md
           # Keep the branch name stable so repeated runs update the same PR.
           branch: lint-autofix/${{ github.ref_name }}
           delete-branch: true

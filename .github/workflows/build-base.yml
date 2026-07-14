@@ -37,8 +37,6 @@ run-name: Build Images for Base
 
 permissions:
   contents: read
-  packages: write
-  id-token: write
   actions: read
 
 env:
@@ -71,6 +69,9 @@ jobs:
   build:
     name: "${{ inputs.base }}/${{ matrix.arch }}: Build and test image"
     needs: prepare
+    permissions:
+      id-token: write
+      packages: write
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
@@ -246,6 +247,9 @@ jobs:
   multiarch:
     name: Run multi-arch sign/provenance/publish
     needs: build
+    permissions:
+      id-token: write
+      packages: write
     runs-on: ubuntu-latest
     steps:
       - name: Log in to the container registry

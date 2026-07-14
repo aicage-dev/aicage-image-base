@@ -8,9 +8,6 @@ run-name: Release (${{ github.ref_name }})
 
 permissions:
   contents: read
-  packages: write
-  id-token: write
-  actions: read
 
 jobs:
 
@@ -36,6 +33,11 @@ jobs:
 
   build-images:
     needs: verify-tagged-commit
+    permissions:
+      contents: read
+      actions: read
+      packages: write
+      id-token: write
     uses: ./.github/workflows/build-all-images-worker.yml
 
   release:

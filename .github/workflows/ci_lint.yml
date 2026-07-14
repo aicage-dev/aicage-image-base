@@ -29,10 +29,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: write
-  issues: write
-  pull-requests: write
-  actions: write
+  contents: read
 
 env:
   # create PR with fixes on:
@@ -50,6 +47,10 @@ jobs:
   lint:
     name: Run linters
     if: ${{ github.event_name != 'pull_request' || !startsWith(github.head_ref, 'lint-autofix/') }}
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
     # runs-on: ubuntu-latest
     runs-on: [self-hosted, linux]
     env:

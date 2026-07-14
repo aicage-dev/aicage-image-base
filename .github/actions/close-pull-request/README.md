@@ -18,7 +18,6 @@ The action:
    2. Deletes the PR branch
    3. Logs the closed PR number and title
 
-
 ## Inputs
 
 | Name            | Required | Description                                         | Default             |

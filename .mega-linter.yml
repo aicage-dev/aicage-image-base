@@ -3,7 +3,7 @@ FORMATTERS_DISABLE_ERRORS: false
 
 
 # prettier
-JSON_PRETTIER_ARGUMENTS: "--tab-width 4"
+# JSON_PRETTIER_ARGUMENTS: "--tab-width 4"
 
 # shfmt
 BASH_SHFMT_ARGUMENTS: "--indent 2 -case-indent"

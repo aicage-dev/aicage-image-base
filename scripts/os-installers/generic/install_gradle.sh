@@ -60,7 +60,7 @@ gradle_home="${install_root}/gradle-${gradle_version}"
 ln -sfn "${gradle_home}" "${install_root}/latest"
 ln -sf "${install_root}/latest/bin/gradle" /usr/local/bin/gradle
 
-cat > /etc/profile.d/gradle.sh <<'GRADLE'
+cat >/etc/profile.d/gradle.sh <<'GRADLE'
 export GRADLE_HOME=/opt/gradle/latest
 export PATH="$GRADLE_HOME/bin:$PATH"
 GRADLE

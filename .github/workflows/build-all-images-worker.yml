@@ -85,4 +85,5 @@ jobs:
       base: ${{ matrix.base }}
       git_ref: ${{ github.ref_name }}
       aicage_version: ${{ github.ref_name }}
-    secrets: inherit
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -17,8 +17,8 @@ curl_wrapper() {
     "$@"
 }
 
-curl_wrapper https://download.docker.com/linux/debian/gpg \
-  | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+curl_wrapper https://download.docker.com/linux/debian/gpg |
+  gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 chmod a+r /etc/apt/keyrings/docker.gpg
 
 # repo
@@ -26,7 +26,7 @@ chmod a+r /etc/apt/keyrings/docker.gpg
 . /etc/os-release
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
 https://download.docker.com/linux/${ID} ${VERSION_CODENAME} stable" \
-  > /etc/apt/sources.list.d/docker.list
+  >/etc/apt/sources.list.d/docker.list
 
 # install
 apt-get update

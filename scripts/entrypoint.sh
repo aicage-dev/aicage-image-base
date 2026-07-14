@@ -107,7 +107,7 @@ list_home_mount_points() {
     if [[ "${mount_point}" == "${MOUNT_HOME}" || "${mount_point}" == "${MOUNT_HOME}/"* ]]; then
       printf '%s\n' "${mount_point}"
     fi
-  done < "${mountinfo}" | sort -u
+  done <"${mountinfo}" | sort -u
 }
 
 normalize_mount_path() {

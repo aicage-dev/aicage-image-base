@@ -40,7 +40,7 @@ while [[ $# -gt 0 ]]; do
       AICAGE_VERSION="$2"
       shift 2
       ;;
-    -h|--help)
+    -h | --help)
       usage
       ;;
     --)
@@ -67,9 +67,9 @@ VERSION_TAG="$(get_image_base_ref):${BASE_ALIAS}-${AICAGE_VERSION}"
 LATEST_TAG="$(get_image_base_ref):${BASE_ALIAS}"
 
 (
-echo "UpstreamBase=${FROM_IMAGE}"
- echo "Installer=${OS_INSTALLER}"
- echo "Tags=${VERSION_TAG},${LATEST_TAG}"
+  echo "UpstreamBase=${FROM_IMAGE}"
+  echo "Installer=${OS_INSTALLER}"
+  echo "Tags=${VERSION_TAG},${LATEST_TAG}"
 ) >&2
 
 docker build \

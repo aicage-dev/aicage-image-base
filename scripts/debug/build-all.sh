@@ -34,11 +34,14 @@ load_config_file
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --version)
-      [[ $# -ge 2 ]] || { echo "[build-base-all] --version requires a value" >&2; exit 1; }
+      [[ $# -ge 2 ]] || {
+        echo "[build-base-all] --version requires a value" >&2
+        exit 1
+      }
       AICAGE_VERSION="$2"
       shift 2
       ;;
-    -h|--help)
+    -h | --help)
       usage
       ;;
     *)

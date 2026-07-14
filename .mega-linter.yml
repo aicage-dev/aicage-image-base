@@ -10,4 +10,4 @@ REPOSITORY_TRIVY_ARGUMENTS: "--ignorefile ./.trivyignore.yaml"
 ACTION_ZIZMOR_UNSECURED_ENV_VARIABLES:
   - GITHUB_TOKEN
 
-CKV_GITHUB_CONF_DIR_NAME: "/tmp/.megalinter_github_conf"
+REPOSITORY_CHECKOv_GITHUB_CONF_DIR_NAME: "/tmp/.megalinter_github_conf"

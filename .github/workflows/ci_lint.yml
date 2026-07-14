@@ -89,7 +89,6 @@ jobs:
           APPLY_FIXES_EVENT: ${{ github.event_name }}
           APPLY_FIXES_MODE: pull_request
           REPORT_OUTPUT_FOLDER: ${{ runner.temp }}/megalinter-reports
-          CKV_GITHUB_CONF_DIR_NAME: ${{ runner.temp }}/.megalinter_github_conf
           # new non-root user test
           MEGALINTER_UID: ${{ env.MEGALINTER_UID }}
           MEGALINTER_GID: ${{ env.MEGALINTER_GID }}

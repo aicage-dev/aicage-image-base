@@ -64,7 +64,7 @@ jobs:
           fi
 
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
         with:
           token: ${{ secrets.PAT || github.token }}
           fetch-depth: 0
@@ -81,7 +81,7 @@ jobs:
       - name: MegaLinter
         id: ml
         continue-on-error: true
-        uses: oxsecurity/megalinter@ef3e84b8b836d76db562d0f3ed7da61e8fd538bc # v9.6.0
+        uses: oxsecurity/megalinter@ef3e84b8b836d76db562d0f3ed7da61e8fd538bc  # v9.6.0
         env:
           VALIDATE_ALL_CODEBASE: true
           GITHUB_TOKEN: ${{ github.token }}
@@ -92,7 +92,7 @@ jobs:
           # new non-root user test
           MEGALINTER_UID: ${{ env.MEGALINTER_UID }}
           MEGALINTER_GID: ${{ env.MEGALINTER_GID }}
-          MEGALINTER_USER:  ${{ env.MEGALINTER_USER }}
+          MEGALINTER_USER: ${{ env.MEGALINTER_USER }}
 
       - name: "Debug: Print info about megalinter-reports folder"
         run: |
@@ -107,7 +107,7 @@ jobs:
 
       - name: Upload MegaLinter artifacts
         if: success() || failure()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
         with:
           name: MegaLinter reports
           include-hidden-files: "true"
@@ -116,7 +116,7 @@ jobs:
             mega-linter.log
 
       - name: Create Pull Request with applied fixes
-        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1  # v8.1.1
         id: cpr
         if: >-
           always() &&

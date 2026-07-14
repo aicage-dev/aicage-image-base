@@ -2,10 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "AICAGE base build definition",
   "type": "object",
-  "required": [
-    "os_installer",
-    "test_suite"
-  ],
+  "required": ["os_installer", "test_suite"],
   "properties": {
     "os_installer": {
       "type": "string"

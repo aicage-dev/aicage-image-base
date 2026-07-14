@@ -16,6 +16,9 @@ run-name: Build Images for Base
         description: Version to build
         required: true
         type: string
+    secrets:
+      GITHUB_TOKEN:
+        required: false
   workflow_dispatch:
     inputs:
       base:

@@ -95,8 +95,8 @@ get_base_list_field() {
 
   [[ -f "${definition_file}" ]] || _die "Missing base.yml for '${alias}'"
 
-  yq -r ".${field} // [] | .[]" "${definition_file}" \
-    || _die "Failed to read ${field} from ${definition_file}"
+  yq -r ".${field} // [] | .[]" "${definition_file}" ||
+    _die "Failed to read ${field} from ${definition_file}"
 }
 
 get_base_architectures() {

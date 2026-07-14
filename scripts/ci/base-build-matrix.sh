@@ -15,7 +15,7 @@ die() {
 source "${ROOT_DIR}/scripts/common.sh"
 
 matrix_file="$(mktemp)"
-echo '{"include":[]}' > "${matrix_file}"
+echo '{"include":[]}' >"${matrix_file}"
 
 while IFS= read -r arch; do
   [[ -n "${arch}" ]] || continue
@@ -46,7 +46,7 @@ while IFS= read -r arch; do
         }
       ]
     ' \
-    "${matrix_file}" > "${matrix_file}.tmp"
+    "${matrix_file}" >"${matrix_file}.tmp"
   mv "${matrix_file}.tmp" "${matrix_file}"
 done < <(get_base_architectures "${BASE_ALIAS}")
 

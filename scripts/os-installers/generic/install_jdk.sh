@@ -13,7 +13,7 @@ fi
 
 case "$(uname -m)" in
   x86_64) JDK_ARCH="x64" ;;
-  aarch64|arm64) JDK_ARCH="aarch64" ;;
+  aarch64 | arm64) JDK_ARCH="aarch64" ;;
   *)
     echo "Unsupported host architecture: $(uname -m)" >&2
     exit 1
@@ -31,8 +31,8 @@ curl_wrapper() {
 }
 
 jdk_version="$(
-  curl_wrapper "https://api.adoptium.net/v3/info/available_releases?cb=$(date +%s)" \
-    | jq -r '.available_lts_releases | max'
+  curl_wrapper "https://api.adoptium.net/v3/info/available_releases?cb=$(date +%s)" |
+    jq -r '.available_lts_releases | max'
 )"
 
 if [[ -z "${jdk_version}" || "${jdk_version}" == "null" ]]; then
@@ -68,7 +68,7 @@ mkdir -p "${install_root}"
 tar -xzf "${archive_path}" -C "${install_root}"
 
 jdk_contents="${tmp_dir}/jdk-contents.txt"
-tar -tzf "${archive_path}" > "${jdk_contents}"
+tar -tzf "${archive_path}" >"${jdk_contents}"
 jdk_dir="$(head -1 "${jdk_contents}")"
 jdk_dir="${jdk_dir%%/*}"
 jdk_home="${install_root}/${jdk_dir}"
@@ -84,7 +84,7 @@ for bin in "${install_root}/latest/bin/"*; do
   ln -sf "${bin}" "/usr/local/bin/$(basename "${bin}")"
 done
 
-cat > /etc/profile.d/java.sh <<'JAVA'
+cat >/etc/profile.d/java.sh <<'JAVA'
 export JAVA_HOME=/opt/java/latest
 export PATH="$JAVA_HOME/bin:$PATH"
 JAVA

@@ -41,7 +41,7 @@ linker = "musl-gcc"
     install -d "${cargo_home}"
     touch "${cargo_config}"
     if ! grep -Fq "[target.${musl_target}]" "${cargo_config}"; then
-      printf '\n%s' "${rustup_linker_config}" >> "${cargo_config}"
+      printf '\n%s' "${rustup_linker_config}" >>"${cargo_config}"
     fi
   done
 fi
@@ -52,7 +52,7 @@ curl_wrapper https://raw.githubusercontent.com/rust-lang/rustup/master/LICENSE-A
 curl_wrapper https://raw.githubusercontent.com/rust-lang/rustup/master/LICENSE-MIT \
   -o /usr/share/licenses/rustup/LICENSE-MIT
 
-cat > /etc/profile.d/rust.sh <<'RUST'
+cat >/etc/profile.d/rust.sh <<'RUST'
 export RUSTUP_HOME=/usr/local/rustup
 export PATH="/usr/local/cargo/bin:$HOME/.cargo/bin:$PATH"
 RUST

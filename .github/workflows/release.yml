@@ -8,9 +8,6 @@ run-name: Release (${{ github.ref_name }})
 
 permissions:
   contents: read
-  packages: write
-  id-token: write
-  actions: read
 
 jobs:
 
@@ -23,6 +20,7 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Verify tagged commit is on origin/main
         run: |
@@ -35,6 +33,11 @@ jobs:
 
   build-images:
     needs: verify-tagged-commit
+    permissions:
+      contents: read
+      actions: read
+      packages: write
+      id-token: write
     uses: ./.github/workflows/build-all-images-worker.yml
 
   release:
@@ -46,6 +49,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          persist-credentials: false
 
       - name: "Release: Package release artifacts"
         run: |

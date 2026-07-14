@@ -26,7 +26,6 @@ name: GHCR Cleanup
 
 permissions:
   contents: read
-  packages: write
 
 jobs:
   prepare-retention-regex:
@@ -42,6 +41,7 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Export config
         id: config
@@ -119,6 +119,8 @@ jobs:
     name: GHCR cleanup
     needs: prepare-retention-regex
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
     steps:
       - name: Cleanup old images
         uses: ghcr-manager/ghcr-cleanup-manager@e9871d03c6e48d4bbb24a8132872218a73288a4a  # v1.1.6

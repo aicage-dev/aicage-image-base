@@ -34,8 +34,6 @@ run-name: Build Images for Base
 
 permissions:
   contents: read
-  packages: write
-  id-token: write
   actions: read
 
 env:
@@ -56,6 +54,7 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
         with:
           ref: ${{ inputs.git_ref || github.ref }}
+          persist-credentials: false
 
       - name: Resolve supported architectures
         id: matrix
@@ -67,6 +66,10 @@ jobs:
   build:
     name: "${{ inputs.base }}/${{ matrix.arch }}: Build and test image"
     needs: prepare
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
@@ -90,6 +93,7 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
         with:
           ref: ${{ inputs.git_ref || github.ref }}
+          persist-credentials: false
 
       - name: Resolve OCI labels
         id: oci
@@ -209,7 +213,7 @@ jobs:
             ' >/dev/null
 
       - name: "Test: Setup BATS testing framework"
-        uses: bats-core/bats-action@77d6fb60505b4d0d1d73e48bd035b55074bbfb43  # v4.0.0
+        uses: bats-core/bats-action@77d6fb60505b4d0d1d73e48bd035b55074bbfb43  # 4.0.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -241,6 +245,9 @@ jobs:
   multiarch:
     name: Run multi-arch sign/provenance/publish
     needs: build
+    permissions:
+      id-token: write
+      packages: write
     runs-on: ubuntu-latest
     steps:
       - name: Log in to the container registry

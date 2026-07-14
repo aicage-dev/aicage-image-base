@@ -2,6 +2,7 @@
 ARG FROM_IMAGE
 ARG IMAGE_SOURCE_URL
 
+# checkov:skip=CKV_DOCKER_7:Ensure the base image uses a non latest version tag
 FROM ${FROM_IMAGE} AS from_image
 
 ARG IMAGE_SOURCE_URL

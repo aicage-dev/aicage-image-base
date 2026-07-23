@@ -107,7 +107,7 @@ jobs:
 
           BASE_LIST="$(IFS='|'; echo "${ESCAPED_BASES[*]}")"
           RELEASE_LIST="$(IFS='|'; echo "${ESCAPED_RELEASES[*]}")"
-          EXCLUDE_TAGS_REGEX="^(${BASE_LIST})(-(${RELEASE_LIST}))?(-amd64|-arm64)?$"
+          EXCLUDE_TAGS_REGEX="^(${BASE_LIST})(-(${RELEASE_LIST}))?$"
 
           {
             echo "base_list=${BASE_LIST}"

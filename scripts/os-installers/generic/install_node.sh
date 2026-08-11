@@ -7,13 +7,17 @@ if command -v apk >/dev/null 2>&1; then
   # Prefer distro packages on Alpine to avoid missing musl tarballs.
   # xdg-utils: provides xdg-open; required by npm-installed CLI agents (e.g. droid) to open auth/docs URLs
   apk add --no-cache \
-    nodejs-current \
-    npm \
-    xdg-utils
+    "${AICAGE_PACKAGE_NODEJS_CURRENT_INSTALL:-nodejs-current}" \
+    "${AICAGE_PACKAGE_NPM_INSTALL:-npm}" \
+    "${AICAGE_PACKAGE_XDG_UTILS_INSTALL:-xdg-utils}"
 
   npm config set prefix /usr/local
 
-  npm install -g corepack
+  corepack_package="corepack"
+  if [[ -n "${AICAGE_PACKAGE_COREPACK_INSTALL:-}" ]]; then
+    corepack_package="${AICAGE_PACKAGE_COREPACK_INSTALL/=/@}"
+  fi
+  npm install -g "${corepack_package}"
   corepack enable
 
   exit 0
@@ -40,7 +44,8 @@ curl_wrapper() {
     "$@"
 }
 
-NODEJS_VERSION="${NODEJS_VERSION:-}"
+NODEJS_VERSION="${NODEJS_VERSION:-${AICAGE_PACKAGE_NODE_INSTALL:-}}"
+NODEJS_VERSION="${NODEJS_VERSION#*=}"
 if [[ -z "${NODEJS_VERSION}" ]]; then
   NODEJS_VERSION="$(
     curl_wrapper https://nodejs.org/dist/index.json |
@@ -65,22 +70,26 @@ ln -sf /usr/local/bin/npx /usr/bin/npx
 
 npm config set prefix /usr/local
 
-npm install -g corepack
+corepack_package="corepack"
+if [[ -n "${AICAGE_PACKAGE_COREPACK_INSTALL:-}" ]]; then
+  corepack_package="${AICAGE_PACKAGE_COREPACK_INSTALL/=/@}"
+fi
+npm install -g "${corepack_package}"
 corepack enable
 
 # xdg-utils: provides xdg-open; needed by some npm-installed CLI agents (auth/docs URL open)
 if ! command -v xdg-open >/dev/null 2>&1; then
   if command -v apt-get >/dev/null 2>&1; then
-    apt-get update && apt-get install -y --no-install-recommends xdg-utils
+    apt-get update && apt-get install -y --no-install-recommends "${AICAGE_PACKAGE_XDG_UTILS_INSTALL:-xdg-utils}"
   elif command -v dnf >/dev/null 2>&1; then
-    dnf install -y xdg-utils
+    dnf install -y "$(dnf_spec "${AICAGE_PACKAGE_XDG_UTILS_INSTALL:-xdg-utils}")"
   elif command -v yum >/dev/null 2>&1; then
-    yum install -y xdg-utils
+    yum install -y "$(dnf_spec "${AICAGE_PACKAGE_XDG_UTILS_INSTALL:-xdg-utils}")"
   elif command -v zypper >/dev/null 2>&1; then
-    zypper -n in xdg-utils
+    zypper -n in "${AICAGE_PACKAGE_XDG_UTILS_INSTALL:-xdg-utils}"
   elif command -v pacman >/dev/null 2>&1; then
     pacman -Sy --noconfirm xdg-utils
   elif command -v apk >/dev/null 2>&1; then
-    apk add --no-cache xdg-utils
+    apk add --no-cache "${AICAGE_PACKAGE_XDG_UTILS_INSTALL:-xdg-utils}"
   fi
 fi

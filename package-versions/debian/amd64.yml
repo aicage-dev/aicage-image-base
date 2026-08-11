@@ -1,0 +1,275 @@
+distro: debian
+architecture: amd64
+source:
+  package_list: packages/debian.yml
+  base: bases/debian/base.yml
+resolvers:
+  scripts/packages/apt/versions.sh:
+    bash:
+      - name: bash
+        version: 5.2.37-2+b9
+    bash-completion:
+      - name: bash-completion
+        version: 1:2.16.0-7
+    bats:
+      - name: bats
+        version: 1.11.1-1
+    ca-certificates:
+      - name: ca-certificates
+        version: "20250419"
+    curl:
+      - name: curl
+        version: 8.14.1-2+deb13u4
+    dnsutils:
+      - name: bind9-dnsutils
+        version: 1:9.20.26-1~deb13u1
+    file:
+      - name: file
+        version: 1:5.46-5
+    git:
+      - name: git
+        version: 1:2.47.3-0+deb13u1
+    gnupg:
+      - name: gnupg
+        version: 2.4.7-21+deb13u1
+    imagemagick:
+      - name: imagemagick
+        version: 8:7.1.1.43+dfsg1-1+deb13u11
+    iproute2:
+      - name: iproute2
+        version: 6.15.0-1
+    jq:
+      - name: jq
+        version: 1.7.1-6+deb13u3
+    less:
+      - name: less
+        version: 668-1
+    nano:
+      - name: nano
+        version: 8.4-1+deb13u1
+    netcat-openbsd:
+      - name: netcat-openbsd
+        version: 1.229-1
+    openssh-client:
+      - name: openssh-client
+        version: 1:10.0p1-7+deb13u4
+    p7zip-full:
+      - name: p7zip-full
+        version: 16.02+transitional.1
+    patch:
+      - name: patch
+        version: 2.8-2
+    ripgrep:
+      - name: ripgrep
+        version: 14.1.1-1+b4
+    rsync:
+      - name: rsync
+        version: 3.4.1+ds1-5+deb13u4
+    tar:
+      - name: tar
+        version: 1.35+dfsg-3.1
+    time:
+      - name: time
+        version: 1.9-0.2
+    tini:
+      - name: tini
+        version: 0.19.0-3+b7
+    tree:
+      - name: tree
+        version: 2.2.1-1
+    tzdata:
+      - name: tzdata
+        version: 2026b-0+deb13u1
+    unzip:
+      - name: unzip
+        version: 6.0-29
+    xz-utils:
+      - name: xz-utils
+        version: 5.8.1-1+deb13u1
+    yq:
+      - name: yq
+        version: 3.4.3-2
+    zip:
+      - name: zip
+        version: 3.0-15
+    locales:
+      - name: locales
+        version: 2.41-12+deb13u3
+    locales-all:
+      - name: locales-all
+        version: 2.41-12+deb13u3
+    gosu:
+      - name: gosu
+        version: 1.17-3+b4
+    build-essential:
+      - name: build-essential
+        version: "12.12"
+    clang:
+      - name: clang
+        version: 1:19.0-63
+    cmake:
+      - name: cmake
+        version: 3.31.6-2
+    gdb:
+      - name: gdb
+        version: 16.3-1
+    libssl-dev:
+      - name: libssl-dev
+        version: 3.5.6-1~deb13u2
+    lld:
+      - name: lld
+        version: 1:19.0-63
+    lldb:
+      - name: lldb
+        version: 1:19.0-63
+    ltrace:
+      - name: ltrace
+        version: 0.7.91~git20230705.8eabf68-4+b1
+    ninja-build:
+      - name: ninja-build
+        version: 1.12.1-1
+    pkg-config:
+      - name: pkg-config
+        version: 1.8.1-4
+    strace:
+      - name: strace
+        version: 6.13+ds-1
+    valgrind:
+      - name: valgrind
+        version: 1:3.24.0-3
+    zlib1g-dev:
+      - name: zlib1g-dev
+        version: 1:1.3.dfsg+really1.3.1-1+b1
+    autoconf:
+      - name: autoconf
+        version: 2.72-3.1
+    automake:
+      - name: automake
+        version: 1:1.17-4
+    autopoint:
+      - name: autopoint
+        version: 0.23.1-2
+    bison:
+      - name: bison
+        version: 2:3.8.2+dfsg-1+b2
+    flex:
+      - name: flex
+        version: 2.6.4-8.2+b4
+    gawk:
+      - name: gawk
+        version: 1:5.2.1-2+b1
+    libtool:
+      - name: libtool
+        version: 2.5.4-4
+    libtool-bin:
+      - name: libtool-bin
+        version: 2.5.4-4
+    linux-libc-dev:
+      - name: linux-libc-dev
+        version: 6.12.101-1
+    make:
+      - name: make
+        version: 4.4.1-2
+    musl-tools:
+      - name: musl-tools
+        version: 1.2.5-3.1~deb13u1
+    ant:
+      - name: ant
+        version: 1.10.15-1
+    maven:
+      - name: maven
+        version: 3.9.9-1
+    protobuf-compiler:
+      - name: protobuf-compiler
+        version: 3.21.12-11+deb13u1
+    default-mysql-client:
+      - name: default-mysql-client
+        version: 1.1.1
+    postgresql-client:
+      - name: postgresql-client
+        version: 17+278
+    sqlite3:
+      - name: sqlite3
+        version: 3.46.1-7+deb13u1
+    pipx:
+      - name: pipx
+        version: 1.7.1-1
+    procps:
+      - name: procps
+        version: 2:4.0.4-9
+    python3:
+      - name: python3
+        version: 3.13.5-1
+    python3-dev:
+      - name: python3-dev
+        version: 3.13.5-1
+    python3-pip:
+      - name: python3-pip
+        version: 25.1.1+dfsg-1
+    python3-venv:
+      - name: python3-venv
+        version: 3.13.5-1
+    perl:
+      - name: perl
+        version: 5.40.1-6
+    bundler:
+      - name: bundler
+        version: 2.6.7-2
+    ruby-dev:
+      - name: ruby-dev
+        version: 1:3.3+b1
+    ruby-full:
+      - name: ruby-full
+        version: 1:3.3
+    xdg-utils:
+      - name: xdg-utils
+        version: 1.2.1-2
+    golang:
+      - name: golang
+        version: 2:1.24~2
+    docker-buildx-plugin:
+      - name: docker-buildx-plugin
+        version: 0.36.1-1~debian.13~trixie
+    docker-ce-cli:
+      - name: docker-ce-cli
+        version: 5:29.7.2-1~debian.13~trixie
+    docker-compose-plugin:
+      - name: docker-compose-plugin
+        version: 5.4.0-1~debian.13~trixie
+  scripts/packages/npm/versions.sh:
+    corepack:
+      - name: corepack
+        version: 0.35.0
+  scripts/packages/gradle/versions.sh:
+    gradle:
+      - name: gradle
+        version: 9.7.0
+  scripts/packages/jdk/versions.sh:
+    jdk:
+      - name: jdk
+        version: "25"
+  scripts/packages/node/versions.sh:
+    node:
+      - name: node
+        version: 24.19.0
+  scripts/packages/pip/versions.sh:
+    pip:
+      - name: pip
+        version: 26.2.1
+    setuptools:
+      - name: setuptools
+        version: 84.0.0
+    wheel:
+      - name: wheel
+        version: 0.48.0
+  scripts/packages/rust/versions.sh:
+    rust:
+      - name: rust
+        version: 1.97.1
+    rustup:
+      - name: rustup
+        version: 1.29.0
+  scripts/packages/pipx/versions.sh:
+    uv:
+      - name: uv
+        version: 0.12.3

@@ -1,0 +1,318 @@
+distro: alpine
+architecture: amd64
+source:
+  package_list: packages/alpine.yml
+  base: bases/alpine/base.yml
+resolvers:
+  scripts/packages/apk/versions.sh:
+    bash:
+      - name: bash
+        version: 5.3.9-r1
+    bash-completion:
+      - name: bash-completion
+        version: 2.17.0-r1
+    bats:
+      - name: bats
+        version: 1.13.0-r1
+    bind-tools:
+      - name: bind-tools
+        version: 9.20.26-r0
+    ca-certificates:
+      - name: ca-certificates
+        version: 20260611-r0
+    curl:
+      - name: curl
+        version: 8.21.0-r0
+    file:
+      - name: file
+        version: 5.47-r2
+    git:
+      - name: git
+        version: 2.54.0-r0
+    gnupg:
+      - name: gnupg
+        version: 2.4.9-r1
+    imagemagick:
+      - name: imagemagick
+        version: 7.1.2.27-r0
+    iproute2:
+      - name: iproute2
+        version: 7.0.0-r0
+    jq:
+      - name: jq
+        version: 1.8.1-r0
+    less:
+      - name: less
+        version: 702-r0
+    nano:
+      - name: nano
+        version: 9.2-r0
+    netcat-openbsd:
+      - name: netcat-openbsd
+        version: 1.234.1-r0
+    patch:
+      - name: patch
+        version: 2.8-r0
+    ripgrep:
+      - name: ripgrep
+        version: 15.1.0-r0
+    rsync:
+      - name: rsync
+        version: 3.4.3-r1
+    shadow:
+      - name: shadow
+        version: 4.18.0-r1
+    tar:
+      - name: tar
+        version: 1.35-r5
+    time:
+      - name: time
+        version: 1.10-r0
+    tini:
+      - name: tini
+        version: 0.19.0-r3
+    tree:
+      - name: tree
+        version: 2.3.2-r0
+    tzdata:
+      - name: tzdata
+        version: 2026c-r0
+    unzip:
+      - name: unzip
+        version: 6.0-r16
+    xz:
+      - name: xz
+        version: 5.8.3-r0
+    zip:
+      - name: zip
+        version: 3.0-r13
+    musl-locales:
+      - name: musl-locales
+        version: 0.1.0-r1
+    musl-locales-lang:
+      - name: musl-locales-lang
+        version: 0.1.0-r1
+    gosu:
+      - name: gosu
+        version: 1.19-r4
+    autoconf:
+      - name: autoconf
+        version: 2.73-r0
+    automake:
+      - name: automake
+        version: 1.18.1-r1
+    bison:
+      - name: bison
+        version: 3.8.2-r3
+    build-base:
+      - name: build-base
+        version: 0.5-r4
+    cmake:
+      - name: cmake
+        version: 4.2.3-r0
+    flex:
+      - name: flex
+        version: 2.6.4-r8
+    gawk:
+      - name: gawk
+        version: 5.3.2-r2
+    gdb:
+      - name: gdb
+        version: 16.3-r4
+    gettext:
+      - name: gettext
+        version: 1.0-r0
+    libtool:
+      - name: libtool
+        version: 2.6.0-r1
+    lldb:
+      - name: lldb
+        version: 22.1.3-r0
+    ltrace:
+      - name: ltrace
+        version: 0.7.3-r6
+    openssl-dev:
+      - name: openssl-dev
+        version: 3.5.7-r0
+    pkgconf:
+      - name: pkgconf
+        version: 2.5.1-r0
+    strace:
+      - name: strace
+        version: 6.19-r1
+    valgrind:
+      - name: valgrind
+        version: 3.25.1-r2
+    zlib-dev:
+      - name: zlib-dev
+        version: 1.3.2-r0
+    apache-ant:
+      - name: apache-ant
+        version: 1.10.16-r0
+    maven:
+      - name: maven
+        version: 3.9.16-r0
+    protobuf:
+      - name: protobuf
+        version: 31.1-r1
+    mariadb-client:
+      - name: mariadb-client
+        version: 11.8.8-r0
+    sqlite:
+      - name: sqlite
+        version: 3.53.2-r0
+    py3-pip:
+      - name: py3-pip
+        version: 26.1.2-r0
+    py3-virtualenv:
+      - name: py3-virtualenv
+        version: 21.3.3-r0
+    python3:
+      - name: python3
+        version: 3.14.5-r0
+    python3-dev:
+      - name: python3-dev
+        version: 3.14.5-r0
+    perl:
+      - name: perl
+        version: 5.42.2-r0
+    ruby:
+      - name: ruby
+        version: 3.4.9-r0
+    ruby-bundler:
+      - name: ruby-bundler
+        version: 2.6.9-r0
+    ruby-dev:
+      - name: ruby-dev
+        version: 3.4.9-r0
+    nodejs-current:
+      - name: nodejs-current
+        version: 26.3.1-r0
+    npm:
+      - name: npm
+        version: 11.12.1-r0
+    xdg-utils:
+      - name: xdg-utils
+        version: 1.2.1-r1
+    go:
+      - name: go
+        version: 1.26.3-r0
+    docker-cli:
+      - name: docker-cli
+        version: 29.5.3-r0
+    docker-cli-buildx:
+      - name: docker-cli-buildx
+        version: 0.34.1-r0
+    docker-cli-compose:
+      - name: docker-cli-compose
+        version: 5.1.4-r0
+    clang:
+      - name: fortify-headers
+        version: 3.0.1-r2
+      - name: libgcc-static
+        version: 15.2.0-r5
+      - name: libstdc++-dev
+        version: 15.2.0-r5
+      - name: llvm22-linker-tools
+        version: 22.1.3-r0
+      - name: musl-dev
+        version: 1.2.6-r2
+      - name: clang22
+        version: 22.1.3-r2
+    lld:
+      - name: lld22
+        version: 22.1.3-r0
+    ninja:
+      - name: samurai
+        version: 1.2-r8
+    openssh-client:
+      - name: openssh-keygen
+        version: 10.3_p1-r0
+      - name: ncurses-terminfo-base
+        version: 6.6_p20260516-r0
+      - name: libncursesw
+        version: 6.6_p20260516-r0
+      - name: libedit
+        version: 20260508.3.1-r1
+      - name: openssh-client-common
+        version: 10.3_p1-r0
+      - name: openssh-client-default
+        version: 10.3_p1-r0
+    p7zip:
+      - name: libgcc
+        version: 15.2.0-r5
+      - name: libstdc++
+        version: 15.2.0-r5
+      - name: 7zip
+        version: 26.01-r0
+    postgresql-client:
+      - name: postgresql-common
+        version: 1.3-r0
+      - name: lz4-libs
+        version: 1.10.0-r1
+      - name: libpq
+        version: 18.4-r0
+      - name: ncurses-terminfo-base
+        version: 6.6_p20260516-r0
+      - name: libncursesw
+        version: 6.6_p20260516-r0
+      - name: readline
+        version: 8.3.3-r1
+      - name: zstd-libs
+        version: 1.5.7-r2
+      - name: postgresql18-client
+        version: 18.4-r0
+    procps:
+      - name: libintl
+        version: 1.0-r0
+      - name: ncurses-terminfo-base
+        version: 6.6_p20260516-r0
+      - name: libncursesw
+        version: 6.6_p20260516-r0
+      - name: skalibs-libs
+        version: 2.15.0.0-r0
+      - name: utmps-libs
+        version: 0.1.3.3-r0
+      - name: libproc2
+        version: 4.0.6-r0
+      - name: procps-ng
+        version: 4.0.6-r0
+    yq:
+      - name: yq-go
+        version: 4.53.3-r0
+  scripts/packages/npm/versions.sh:
+    corepack:
+      - name: corepack
+        version: 0.35.0
+  scripts/packages/gradle/versions.sh:
+    gradle:
+      - name: gradle
+        version: 9.7.0
+  scripts/packages/jdk/versions.sh:
+    jdk:
+      - name: jdk
+        version: "25"
+  scripts/packages/pip/versions.sh:
+    pip:
+      - name: pip
+        version: 26.2.1
+    setuptools:
+      - name: setuptools
+        version: 84.0.0
+    wheel:
+      - name: wheel
+        version: 0.48.0
+    pipx:
+      - name: pipx
+        version: 1.16.6
+  scripts/packages/rust/versions.sh:
+    rust:
+      - name: rust
+        version: 1.97.1
+    rustup:
+      - name: rustup
+        version: 1.29.0
+  scripts/packages/pipx/versions.sh:
+    uv:
+      - name: uv
+        version: 0.12.3

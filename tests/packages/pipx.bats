@@ -1,0 +1,45 @@
+#!/usr/bin/env bats
+
+load test_helper
+
+setup() {
+  repo_root="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
+  resolver="${repo_root}/scripts/packages/pipx/versions.sh"
+  base_yml="${repo_root}/bases/debian/base.yml"
+}
+
+@test "pipx resolver returns package versions as JSON" {
+  require_command curl
+  require_command jq
+
+  run "${resolver}" "${base_yml}" uv
+
+  [ "$status" -eq 0 ]
+  validate_package_resolver_output
+  [ "$(jq -r '.items | length' <<<"${output}")" -eq 1 ]
+  [ "$(jq -r '.items[0].name' <<<"${output}")" = "uv" ]
+  [ "$(jq -r '.items[0].versions[0].name' <<<"${output}")" = "uv" ]
+  [ "$(jq -r '.items[0].versions[0].version | length > 0' <<<"${output}")" = "true" ]
+}
+
+@test "pipx resolver rejects missing package arguments" {
+  run "${resolver}" "${base_yml}"
+
+  [ "$status" -eq 2 ]
+}
+
+@test "pipx resolver rejects unexpected package arguments" {
+  run "${resolver}" "${base_yml}" uv unexpected
+
+  [ "$status" -eq 2 ]
+
+  run "${resolver}" "${base_yml}" unexpected
+
+  [ "$status" -eq 1 ]
+}
+
+@test "pipx resolver rejects missing base definition" {
+  run "${resolver}" "${repo_root}/bases/missing/base.yml" uv
+
+  [ "$status" -eq 1 ]
+}

@@ -2,4 +2,4 @@
 set -euo pipefail
 
 apk add --no-cache \
-  perl
+  "${AICAGE_PACKAGE_PERL_INSTALL:-perl}"

@@ -2,4 +2,4 @@
 set -euo pipefail
 
 apt-get install -y --no-install-recommends \
-  perl
+  "${AICAGE_PACKAGE_PERL_INSTALL:-perl}"

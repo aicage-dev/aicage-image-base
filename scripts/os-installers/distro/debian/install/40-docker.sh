@@ -31,9 +31,9 @@ https://download.docker.com/linux/${ID} ${VERSION_CODENAME} stable" \
 # install
 apt-get update
 apt-get install -y --no-install-recommends \
-  docker-ce-cli \
-  docker-compose-plugin \
-  docker-buildx-plugin
+  "${AICAGE_PACKAGE_DOCKER_CE_CLI_INSTALL:-docker-ce-cli}" \
+  "${AICAGE_PACKAGE_DOCKER_COMPOSE_PLUGIN_INSTALL:-docker-compose-plugin}" \
+  "${AICAGE_PACKAGE_DOCKER_BUILDX_PLUGIN_INSTALL:-docker-buildx-plugin}"
 
 # cleanup
 rm -rf "${GNUPGHOME}"

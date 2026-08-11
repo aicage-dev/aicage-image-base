@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AICAGE package versions",
+  "type": "object",
+  "required": [
+    "distro",
+    "architecture",
+    "source",
+    "resolvers"
+  ],
+  "properties": {
+    "distro": {
+      "type": "string",
+      "pattern": ".*\\S.*"
+    },
+    "architecture": {
+      "type": "string",
+      "enum": ["amd64", "arm64"]
+    },
+    "source": {
+      "type": "object",
+      "required": ["package_list", "base"],
+      "properties": {
+        "package_list": {
+          "type": "string",
+          "pattern": "^packages/[^/]+\\.yml$"
+        },
+        "base": {
+          "type": "string",
+          "pattern": "^bases/[^/]+/base\\.yml$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "resolvers": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^scripts/packages/([^/]+)/versions\\.sh$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["name", "version"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "pattern": ".*\\S.*"
+              },
+              "version": {
+                "type": "string",
+                "pattern": ".*\\S.*"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -21,7 +21,10 @@ if ! command -v gosu >/dev/null 2>&1; then
       ;;
   esac
 
-  GOSU_VERSION="$(curl_wrapper https://api.github.com/repos/tianon/gosu/releases/latest | jq -r '.tag_name')"
+  GOSU_VERSION="${AICAGE_PACKAGE_GOSU_INSTALL:-}"
+  if [[ -z "${GOSU_VERSION}" ]]; then
+    GOSU_VERSION="$(curl_wrapper https://api.github.com/repos/tianon/gosu/releases/latest | jq -r '.tag_name')"
+  fi
   curl_wrapper "https://github.com/tianon/gosu/releases/download/${GOSU_VERSION}/gosu-${ARCH}" \
     -o /usr/local/bin/gosu
   chmod +x /usr/local/bin/gosu

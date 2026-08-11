@@ -15,10 +15,16 @@ curl_wrapper() {
     "$@"
 }
 
-gradle_json="$(curl_wrapper https://services.gradle.org/versions/current)"
-gradle_version="$(echo "${gradle_json}" | jq -r '.version')"
-download_url="$(echo "${gradle_json}" | jq -r '.downloadUrl')"
-checksum_url="$(echo "${gradle_json}" | jq -r '.checksumUrl')"
+gradle_version="${AICAGE_PACKAGE_GRADLE_INSTALL:-}"
+if [[ -n "${gradle_version}" ]]; then
+  download_url="https://services.gradle.org/distributions/gradle-${gradle_version}-bin.zip"
+  checksum_url="${download_url}.sha256"
+else
+  gradle_json="$(curl_wrapper https://services.gradle.org/versions/current)"
+  gradle_version="$(echo "${gradle_json}" | jq -r '.version')"
+  download_url="$(echo "${gradle_json}" | jq -r '.downloadUrl')"
+  checksum_url="$(echo "${gradle_json}" | jq -r '.checksumUrl')"
+fi
 
 if [[ -z "${gradle_version}" || "${gradle_version}" == "null" ]]; then
   echo "Unable to resolve Gradle version" >&2

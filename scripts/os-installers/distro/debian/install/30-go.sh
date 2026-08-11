@@ -2,4 +2,4 @@
 set -euo pipefail
 
 apt-get install -y --no-install-recommends \
-  golang
+  "${AICAGE_PACKAGE_GOLANG_INSTALL:-golang}"

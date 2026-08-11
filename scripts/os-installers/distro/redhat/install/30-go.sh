@@ -2,4 +2,4 @@
 set -euo pipefail
 
 dnf -y install \
-  golang
+  "${AICAGE_PACKAGE_GOLANG_INSTALL:-golang}"

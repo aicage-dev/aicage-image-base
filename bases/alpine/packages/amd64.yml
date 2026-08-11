@@ -1,0 +1,196 @@
+packages:
+  bash:
+    - bash=5.3.9-r1
+  bash-completion:
+    - bash-completion=2.17.0-r1
+  bats:
+    - bats=1.13.0-r1
+  bind-tools:
+    - bind-tools=9.20.26-r0
+  ca-certificates:
+    - ca-certificates=20260611-r0
+  curl:
+    - curl=8.21.0-r0
+  file:
+    - file=5.47-r2
+  git:
+    - git=2.54.0-r0
+  gnupg:
+    - gnupg=2.4.9-r1
+  imagemagick:
+    - imagemagick=7.1.2.27-r0
+  iproute2:
+    - iproute2=7.0.0-r0
+  jq:
+    - jq=1.8.1-r0
+  less:
+    - less=702-r0
+  nano:
+    - nano=9.2-r0
+  netcat-openbsd:
+    - netcat-openbsd=1.234.1-r0
+  patch:
+    - patch=2.8-r0
+  ripgrep:
+    - ripgrep=15.1.0-r0
+  rsync:
+    - rsync=3.4.3-r1
+  shadow:
+    - shadow=4.18.0-r1
+  tar:
+    - tar=1.35-r5
+  time:
+    - time=1.10-r0
+  tini:
+    - tini=0.19.0-r3
+  tree:
+    - tree=2.3.2-r0
+  tzdata:
+    - tzdata=2026c-r0
+  unzip:
+    - unzip=6.0-r16
+  xz:
+    - xz=5.8.3-r0
+  zip:
+    - zip=3.0-r13
+  musl-locales:
+    - musl-locales=0.1.0-r1
+  musl-locales-lang:
+    - musl-locales-lang=0.1.0-r1
+  gosu:
+    - gosu=1.19-r4
+  autoconf:
+    - autoconf=2.73-r0
+  automake:
+    - automake=1.18.1-r1
+  bison:
+    - bison=3.8.2-r3
+  build-base:
+    - build-base=0.5-r4
+  cmake:
+    - cmake=4.2.3-r0
+  flex:
+    - flex=2.6.4-r8
+  gawk:
+    - gawk=5.3.2-r2
+  gdb:
+    - gdb=16.3-r4
+  gettext:
+    - gettext=1.0-r0
+  libtool:
+    - libtool=2.6.0-r1
+  lldb:
+    - lldb=22.1.3-r0
+  ltrace:
+    - ltrace=0.7.3-r6
+  openssl-dev:
+    - openssl-dev=3.5.7-r0
+  pkgconf:
+    - pkgconf=2.5.1-r0
+  strace:
+    - strace=6.19-r1
+  valgrind:
+    - valgrind=3.25.1-r2
+  zlib-dev:
+    - zlib-dev=1.3.2-r0
+  apache-ant:
+    - apache-ant=1.10.16-r0
+  maven:
+    - maven=3.9.16-r0
+  protobuf:
+    - protobuf=31.1-r1
+  mariadb-client:
+    - mariadb-client=11.8.8-r0
+  sqlite:
+    - sqlite=3.53.2-r0
+  py3-pip:
+    - py3-pip=26.1.2-r0
+  py3-virtualenv:
+    - py3-virtualenv=21.3.3-r0
+  python3:
+    - python3=3.14.5-r0
+  python3-dev:
+    - python3-dev=3.14.5-r0
+  perl:
+    - perl=5.42.2-r0
+  ruby:
+    - ruby=3.4.9-r0
+  ruby-bundler:
+    - ruby-bundler=2.6.9-r0
+  ruby-dev:
+    - ruby-dev=3.4.9-r0
+  nodejs-current:
+    - nodejs-current=26.3.1-r0
+  npm:
+    - npm=11.12.1-r0
+  xdg-utils:
+    - xdg-utils=1.2.1-r1
+  go:
+    - go=1.26.3-r0
+  docker-cli:
+    - docker-cli=29.5.3-r0
+  docker-cli-buildx:
+    - docker-cli-buildx=0.34.1-r0
+  docker-cli-compose:
+    - docker-cli-compose=5.1.4-r0
+  clang:
+    - fortify-headers=3.0.1-r2
+    - libgcc-static=15.2.0-r5
+    - libstdc++-dev=15.2.0-r5
+    - llvm22-linker-tools=22.1.3-r0
+    - musl-dev=1.2.6-r2
+    - clang22=22.1.3-r2
+  lld:
+    - lld22=22.1.3-r0
+  ninja:
+    - samurai=1.2-r8
+  openssh-client:
+    - openssh-keygen=10.3_p1-r0
+    - ncurses-terminfo-base=6.6_p20260516-r0
+    - libncursesw=6.6_p20260516-r0
+    - libedit=20260508.3.1-r1
+    - openssh-client-common=10.3_p1-r0
+    - openssh-client-default=10.3_p1-r0
+  p7zip:
+    - libgcc=15.2.0-r5
+    - libstdc++=15.2.0-r5
+    - 7zip=26.01-r0
+  postgresql-client:
+    - postgresql-common=1.3-r0
+    - lz4-libs=1.10.0-r1
+    - libpq=18.4-r0
+    - ncurses-terminfo-base=6.6_p20260516-r0
+    - libncursesw=6.6_p20260516-r0
+    - readline=8.3.3-r1
+    - zstd-libs=1.5.7-r2
+    - postgresql18-client=18.4-r0
+  procps:
+    - libintl=1.0-r0
+    - ncurses-terminfo-base=6.6_p20260516-r0
+    - libncursesw=6.6_p20260516-r0
+    - skalibs-libs=2.15.0.0-r0
+    - utmps-libs=0.1.3.3-r0
+    - libproc2=4.0.6-r0
+    - procps-ng=4.0.6-r0
+  yq:
+    - yq-go=4.53.3-r0
+  corepack:
+    - corepack=0.35.0
+  gradle:
+    - gradle=9.7.0
+  jdk:
+    - jdk=25
+  pip:
+    - pip=26.2.1
+  setuptools:
+    - setuptools=84.0.0
+  wheel:
+    - wheel=0.48.0
+  pipx:
+    - pipx=1.16.6
+  rust:
+    - rust=1.97.1
+  rustup:
+    - rustup=1.29.0
+  uv:
+    - uv=0.12.3

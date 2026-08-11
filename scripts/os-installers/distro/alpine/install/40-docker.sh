@@ -2,6 +2,6 @@
 set -euo pipefail
 
 apk add --no-cache \
-  docker-cli \
-  docker-cli-compose \
-  docker-cli-buildx
+  "${AICAGE_PACKAGE_DOCKER_CLI_INSTALL:-docker-cli}" \
+  "${AICAGE_PACKAGE_DOCKER_CLI_COMPOSE_INSTALL:-docker-cli-compose}" \
+  "${AICAGE_PACKAGE_DOCKER_CLI_BUILDX_INSTALL:-docker-cli-buildx}"

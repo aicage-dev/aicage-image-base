@@ -161,6 +161,7 @@ jobs:
             FROM_IMAGE=${{ env.FROM_IMAGE }}
             IMAGE_SOURCE_URL=${{ env.IMAGE_SOURCE_URL }}
             OS_INSTALLER=${{ env.OS_INSTALLER }}
+            PACKAGE_ENV_FILE=bases/${{ env.BASE_ALIAS }}/packages/${{ env.ARCH_SUFFIX }}.env
           tags: |
             ${{ env.IMAGE_TEST_TAG }}
           labels: |

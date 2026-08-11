@@ -21,6 +21,8 @@ pip install -r requirements-dev.txt
 ## Repo layout
 
 - `bases/<alias>/base.yml` — Defines the upstream image and installer for each base.
+- `bases/<alias>/packages/packages.yml` — Lists packages and tool resolvers for the base.
+- `bases/<alias>/packages/<arch>.{yml,env}` — Resolved package versions for one architecture.
 - `Dockerfile` — Docker build entrypoint.
 - `scripts/` — Build/test helpers.
 - `tests/bases/smoke/` — Bats suites for base images.
@@ -82,9 +84,10 @@ Smoke suites live in `tests/bases/smoke/` (including subfolders); run individual
 ## Adding a base
 
 1. Create `bases/<alias>/base.yml` with `from_image` and `os_installer`.
-2. Add or adjust installer scripts if the base needs extra setup.
-3. Update smoke coverage under `tests/bases/smoke/` if the new base requires validation.
-4. Document the new base in `README.md` if it should be visible to users.
+2. Create `bases/<alias>/packages/packages.yml` with the base package list.
+3. Add or adjust installer scripts if the base needs extra setup.
+4. Update smoke coverage under `tests/bases/smoke/` if the new base requires validation.
+5. Document the new base in `README.md` if it should be visible to users.
 
 ## CI
 

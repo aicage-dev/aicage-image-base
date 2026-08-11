@@ -42,4 +42,14 @@ check-jsonschema \
 
 check-jsonschema \
   --schemafile validation/packages.json \
-  packages/*.yml
+  bases/*/packages/packages.yml
+
+mapfile -t resolved_package_files < <(
+  find bases -path '*/packages/*.yml' -not -name packages.yml -type f 2>/dev/null | sort
+)
+
+if [[ ${#resolved_package_files[@]} -gt 0 ]]; then
+  check-jsonschema \
+    --schemafile validation/package-versions.json \
+    "${resolved_package_files[@]}"
+fi

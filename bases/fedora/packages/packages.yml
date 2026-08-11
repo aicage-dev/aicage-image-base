@@ -1,0 +1,121 @@
+distro: fedora
+resolvers:
+  scripts/packages/dnf/versions.sh:
+    00-core:
+      - bash
+      - bash-completion
+      - bats
+      - bind-utils
+      - ca-certificates
+      - curl
+      - dnf-plugins-core
+      - file
+      - git
+      - gnupg2
+      - ImageMagick
+      - iproute
+      - jq
+      - less
+      - nano
+      - nmap-ncat
+      - openssh-clients
+      - p7zip
+      - patch
+      - procps-ng
+      - ripgrep
+      - rsync
+      - shadow-utils
+      - tar
+      - time
+      - tini
+      - tree
+      - tzdata
+      - unzip
+      - xz
+      - yq
+      - zip
+    01-locale:
+      - glibc-all-langpacks
+      - glibc-locale-source
+    10-c-cpp-groups:
+      - development-tools
+    10-c-cpp:
+      - clang
+      - cmake
+      - gdb
+      - lld
+      - lldb
+      - ltrace
+      - ninja-build
+      - openssl-devel
+      - pkgconf-pkg-config
+      - strace
+      - valgrind
+      - zlib-devel
+    11-musl:
+      - autoconf
+      - automake
+      - bison
+      - flex
+      - gawk
+      - gettext
+      - gettext-devel
+      - libtool
+      - musl-devel
+      - musl-gcc
+      - musl-libc-static
+    15-java:
+      - ant
+      - maven
+      - protobuf-compiler
+    17-database-clients:
+      - mysql
+      - postgresql
+      - sqlite
+    20-python:
+      - pipx
+      - python3
+      - python3-devel
+      - python3-pip
+      - python3-virtualenv
+    21-perl:
+      - perl
+    22-ruby:
+      - ruby
+      - ruby-devel
+      - rubygem-bundler
+    25-node:
+      - xdg-utils
+    30-go:
+      - golang
+    40-docker:
+      - docker-buildx-plugin
+      - docker-ce-cli
+      - docker-compose-plugin
+  scripts/packages/npm/versions.sh:
+    25-node:
+      - corepack
+  scripts/packages/gosu/versions.sh:
+    02-gosu:
+      - gosu
+  scripts/packages/gradle/versions.sh:
+    16-gradle:
+      - gradle
+  scripts/packages/jdk/versions.sh:
+    15-java:
+      - jdk
+  scripts/packages/node/versions.sh:
+    25-node:
+      - node
+  scripts/packages/pip/versions.sh:
+    20-python:
+      - pip
+      - setuptools
+      - wheel
+  scripts/packages/rust/versions.sh:
+    35-rust:
+      - rust
+      - rustup
+  scripts/packages/pipx/versions.sh:
+    20-python:
+      - uv

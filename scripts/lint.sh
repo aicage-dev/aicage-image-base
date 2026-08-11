@@ -39,3 +39,7 @@ check-jsonschema \
 check-jsonschema \
   --schemafile validation/base-build.schema.json \
   bases/*/base-build.yml
+
+check-jsonschema \
+  --schemafile validation/packages.json \
+  packages/*.yml

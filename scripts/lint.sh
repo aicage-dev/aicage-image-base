@@ -43,3 +43,11 @@ check-jsonschema \
 check-jsonschema \
   --schemafile validation/packages.json \
   packages/*.yml
+
+mapfile -t resolved_package_files < <(find package-versions -type f -name '*.yml' 2>/dev/null | sort)
+
+if [[ ${#resolved_package_files[@]} -gt 0 ]]; then
+  check-jsonschema \
+    --schemafile validation/package-versions.json \
+    "${resolved_package_files[@]}"
+fi

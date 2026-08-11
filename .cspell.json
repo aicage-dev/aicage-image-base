@@ -80,8 +80,6 @@
     "usermod",
     "venv",
     "virtualenv",
-    "xclip",
-    "xsel",
     "zoneinfo"
   ]
 }

@@ -77,13 +77,6 @@ set_target_env() {
   export PATH="${HOME}/.local/bin:${PATH}"
 }
 
-activate_osc52_clipboard_shims() {
-  if [[ "${AICAGE_ENABLE_OSC52_CLIPBOARD:-}" != "1" ]]; then
-    return 0
-  fi
-  export PATH="/opt/aicage/clipboard-shims:${PATH}"
-}
-
 apply_timezone() {
   local timezone="${TZ:-}"
   local zoneinfo_path
@@ -315,7 +308,6 @@ fi
 mirror_windows_home_mounts_to_root
 apply_timezone
 set_target_env "${AICAGE_HOME}" "${AICAGE_HOST_USER}"
-activate_osc52_clipboard_shims
 
 if [[ ! -e "${AICAGE_WORKSPACE}" ]]; then
   mkdir -p "${AICAGE_WORKSPACE}"

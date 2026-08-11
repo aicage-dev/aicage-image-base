@@ -22,17 +22,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 RUN --mount=type=bind,source=scripts/os-installers,target=/tmp/aicage/scripts/os-installers,readonly \
     --mount=type=bind,source=scripts/entrypoint.sh,target=/tmp/aicage/scripts/entrypoint.sh,readonly \
-    --mount=type=bind,source=scripts/osc52-copy.sh,target=/tmp/aicage/scripts/osc52-copy.sh,readonly \
     /tmp/aicage/scripts/os-installers/${OS_INSTALLER} && \
-    cp /tmp/aicage/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh && \
-    echo "Install: Configure optional OSC 52 clipboard shims ..." && \
-    install -d /opt/aicage/clipboard-shims && \
-    cp /tmp/aicage/scripts/osc52-copy.sh /opt/aicage/osc52-copy.sh && \
-    chmod 755 /opt/aicage/osc52-copy.sh && \
-    ln -s ../osc52-copy.sh /opt/aicage/clipboard-shims/wl-copy && \
-    ln -s ../osc52-copy.sh /opt/aicage/clipboard-shims/xclip && \
-    ln -s ../osc52-copy.sh /opt/aicage/clipboard-shims/xsel && \
-    ln -s ../osc52-copy.sh /opt/aicage/clipboard-shims/pbcopy
+    cp /tmp/aicage/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 ENV AICAGE_ENTRYPOINT_CMD=bash
 

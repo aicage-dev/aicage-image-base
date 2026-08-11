@@ -1,0 +1,175 @@
+packages:
+  bash:
+    - bash=5.2.37-2+b9
+  bash-completion:
+    - bash-completion=1:2.16.0-7
+  bats:
+    - bats=1.11.1-1
+  ca-certificates:
+    - ca-certificates=20250419
+  curl:
+    - curl=8.14.1-2+deb13u4
+  dnsutils:
+    - bind9-dnsutils=1:9.20.26-1~deb13u1
+  file:
+    - file=1:5.46-5
+  git:
+    - git=1:2.47.3-0+deb13u1
+  gnupg:
+    - gnupg=2.4.7-21+deb13u1
+  imagemagick:
+    - imagemagick=8:7.1.1.43+dfsg1-1+deb13u11
+  iproute2:
+    - iproute2=6.15.0-1
+  jq:
+    - jq=1.7.1-6+deb13u3
+  less:
+    - less=668-1
+  nano:
+    - nano=8.4-1+deb13u1
+  netcat-openbsd:
+    - netcat-openbsd=1.229-1
+  openssh-client:
+    - openssh-client=1:10.0p1-7+deb13u4
+  p7zip-full:
+    - p7zip-full=16.02+transitional.1
+  patch:
+    - patch=2.8-2
+  ripgrep:
+    - ripgrep=14.1.1-1+b4
+  rsync:
+    - rsync=3.4.1+ds1-5+deb13u4
+  tar:
+    - tar=1.35+dfsg-3.1
+  time:
+    - time=1.9-0.2+b1
+  tini:
+    - tini=0.19.0-3+b7
+  tree:
+    - tree=2.2.1-1
+  tzdata:
+    - tzdata=2026b-0+deb13u1
+  unzip:
+    - unzip=6.0-29
+  xz-utils:
+    - xz-utils=5.8.1-1+deb13u1
+  yq:
+    - yq=3.4.3-2
+  zip:
+    - zip=3.0-15
+  locales:
+    - locales=2.41-12+deb13u3
+  locales-all:
+    - locales-all=2.41-12+deb13u3
+  gosu:
+    - gosu=1.17-3+b4
+  build-essential:
+    - build-essential=12.12
+  clang:
+    - clang=1:19.0-63
+  cmake:
+    - cmake=3.31.6-2
+  gdb:
+    - gdb=16.3-1
+  libssl-dev:
+    - libssl-dev=3.5.6-1~deb13u2
+  lld:
+    - lld=1:19.0-63
+  lldb:
+    - lldb=1:19.0-63
+  ltrace:
+    - ltrace=0.7.91~git20230705.8eabf68-4
+  ninja-build:
+    - ninja-build=1.12.1-1+b1
+  pkg-config:
+    - pkg-config=1.8.1-4
+  strace:
+    - strace=6.13+ds-1
+  valgrind:
+    - valgrind=1:3.24.0-3
+  zlib1g-dev:
+    - zlib1g-dev=1:1.3.dfsg+really1.3.1-1+b1
+  autoconf:
+    - autoconf=2.72-3.1
+  automake:
+    - automake=1:1.17-4
+  autopoint:
+    - autopoint=0.23.1-2
+  bison:
+    - bison=2:3.8.2+dfsg-1+b2
+  flex:
+    - flex=2.6.4-8.2+b4
+  gawk:
+    - gawk=1:5.2.1-2+b2
+  libtool:
+    - libtool=2.5.4-4
+  libtool-bin:
+    - libtool-bin=2.5.4-4
+  linux-libc-dev:
+    - linux-libc-dev=6.12.101-1
+  make:
+    - make=4.4.1-2
+  musl-tools:
+    - musl-tools=1.2.5-3.1~deb13u1
+  ant:
+    - ant=1.10.15-1
+  maven:
+    - maven=3.9.9-1
+  protobuf-compiler:
+    - protobuf-compiler=3.21.12-11+deb13u1
+  default-mysql-client:
+    - default-mysql-client=1.1.1
+  postgresql-client:
+    - postgresql-client=17+278
+  sqlite3:
+    - sqlite3=3.46.1-7+deb13u1
+  pipx:
+    - pipx=1.7.1-1
+  procps:
+    - procps=2:4.0.4-9
+  python3:
+    - python3=3.13.5-1
+  python3-dev:
+    - python3-dev=3.13.5-1
+  python3-pip:
+    - python3-pip=25.1.1+dfsg-1
+  python3-venv:
+    - python3-venv=3.13.5-1
+  perl:
+    - perl=5.40.1-6
+  bundler:
+    - bundler=2.6.7-2
+  ruby-dev:
+    - ruby-dev=1:3.3+b1
+  ruby-full:
+    - ruby-full=1:3.3
+  xdg-utils:
+    - xdg-utils=1.2.1-2
+  golang:
+    - golang=2:1.24~2
+  docker-buildx-plugin:
+    - docker-buildx-plugin=0.36.1-1~debian.13~trixie
+  docker-ce-cli:
+    - docker-ce-cli=5:29.7.2-1~debian.13~trixie
+  docker-compose-plugin:
+    - docker-compose-plugin=5.4.0-1~debian.13~trixie
+  corepack:
+    - corepack=0.35.0
+  gradle:
+    - gradle=9.7.0
+  jdk:
+    - jdk=25
+  node:
+    - node=24.19.0
+  pip:
+    - pip=26.2.1
+  setuptools:
+    - setuptools=84.0.0
+  wheel:
+    - wheel=0.48.0
+  rust:
+    - rust=1.97.1
+  rustup:
+    - rustup=1.29.0
+  uv:
+    - uv=0.12.3

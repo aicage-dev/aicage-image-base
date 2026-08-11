@@ -1,0 +1,52 @@
+distro: arch
+architecture: amd64
+source:
+  package_list: packages/arch.yml
+  base: bases/arch/base.yml
+resolvers:
+  scripts/packages/pacman/versions.sh: {}
+  scripts/packages/npm/versions.sh:
+    corepack:
+      - name: corepack
+        version: 0.35.0
+  scripts/packages/gosu/versions.sh:
+    gosu:
+      - name: gosu
+        version: "1.19"
+  scripts/packages/gradle/versions.sh:
+    gradle:
+      - name: gradle
+        version: 9.7.0
+  scripts/packages/jdk/versions.sh:
+    jdk:
+      - name: jdk
+        version: "25"
+  scripts/packages/node/versions.sh:
+    node:
+      - name: node
+        version: 24.19.0
+  scripts/packages/pip/versions.sh:
+    pip:
+      - name: pip
+        version: 26.2.1
+    setuptools:
+      - name: setuptools
+        version: 84.0.0
+    wheel:
+      - name: wheel
+        version: 0.48.0
+  scripts/packages/rust/versions.sh:
+    rust:
+      - name: rust
+        version: 1.97.1
+    rustup:
+      - name: rustup
+        version: 1.29.0
+  scripts/packages/tini/versions.sh:
+    tini:
+      - name: tini
+        version: v0.19.0
+  scripts/packages/pipx/versions.sh:
+    uv:
+      - name: uv
+        version: 0.12.3

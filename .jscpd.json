@@ -24,6 +24,7 @@
 
     "scripts/os-installers/distro/*/install/02-gosu.sh",
     "scripts/os-installers/generic/install_jdk.sh",
-    "scripts/os-installers/generic/install_node.sh"
+    "scripts/os-installers/generic/install_node.sh",
+    "scripts/packages/*/versions.sh"
   ]
 }

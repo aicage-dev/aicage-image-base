@@ -1,0 +1,125 @@
+distro: fedora
+architecture: arm64
+source:
+  package_list: packages/fedora.yml
+  base: bases/fedora/base.yml
+resolvers:
+  scripts/packages/dnf/versions.sh:
+    bash: 5.3.9-3.fc44
+    bash-completion: 1:2.17-2.fc44
+    bats: 1.13.0-3.fc44
+    bind-utils: 32:9.18.50-1.fc44
+    ca-certificates: 2025.2.80_v9.0.304-7.fc44
+    curl: 8.18.0-8.fc44
+    dnf-plugins-core: 4.10.1-9.fc44
+    file: 5.46-10.fc44
+    git: 2.55.0-1.fc44
+    gnupg2: 2.4.9-16.fc44
+    ImageMagick: 1:7.1.2.27-1.fc44
+    iproute: 6.17.0-2.fc44
+    jq: 1.8.1-3.fc44
+    less: 704-2.fc44
+    nano: 8.7.1-2.fc44
+    nmap-ncat: 4:7.92-11.fc44
+    openssh-clients: 10.2p1-13.fc44
+    p7zip:
+      provider: 7zip-standalone
+      version: 26.02-1.fc44
+    patch: 2.8-4.fc44
+    procps-ng: 4.0.6-1.fc44
+    ripgrep: 15.2.0-1.fc44
+    rsync: 3.4.4-1.fc44
+    shadow-utils: 2:4.19.0-7.fc44
+    tar: 2:1.35-8.fc44
+    time: 1.9-28.fc44
+    tini: 0.19.0-12.fc44
+    tree: 2.2.1-4.fc44
+    tzdata: 2026b-1.fc44
+    unzip: 6.0-69.fc44
+    xz: 1:5.8.2-2.fc44
+    yq: 4.53.3-1.fc44
+    zip: 3.0-45.fc44
+    glibc-all-langpacks: 2.43-8.fc44
+    glibc-locale-source: 2.43-8.fc44
+    clang: 22.1.8-4.fc44
+    cmake: 4.3.0-1.fc44
+    gdb: 17.2-2.fc44
+    lld: 22.1.8-4.fc44
+    lldb: 22.1.8-4.fc44
+    ltrace: 0.8.1-2.fc44
+    ninja-build: 1.13.2-2.fc44
+    openssl-devel: 1:3.5.7-2.fc44
+    pkgconf-pkg-config: 2.5.1-1.fc44
+    strace: 7.1-1.fc44
+    valgrind: 1:3.27.1-1.fc44
+    zlib-devel:
+      provider: zlib-ng-compat-devel
+      version: 2.3.3-3.fc44
+    autoconf: 2.72-10.fc44
+    automake: 1.18.1-4.fc44
+    bison: 3.8.2-15.fc44
+    flex: 2.6.4-24.fc44
+    gawk: 5.3.2-3.fc44
+    gettext: 0.26-5.fc44
+    gettext-devel: 0.26-5.fc44
+    libtool: 2.5.4-10.fc44
+    musl-devel: 1.2.5-6.fc44
+    musl-gcc: 1.2.5-6.fc44
+    musl-libc-static: 1.2.5-6.fc44
+    ant: 1.10.15-38.fc44
+    maven: 1:3.9.11-11.fc44
+    protobuf-compiler: 3.19.6-20.fc44
+    mysql: 8.4.10-1.fc44
+    postgresql: 18.4-1.fc44
+    sqlite: 3.51.2-1.fc44
+    pipx: 1.15.0-2.fc44
+    python3: 3.14.6-1.fc44
+    python3-devel: 3.14.6-1.fc44
+    python3-pip: 26.0.1-2.fc44
+    python3-virtualenv: 20.35.4-4.fc44
+    perl: 4:5.42.3-525.fc44
+    ruby: 4.0.6-36.fc44
+    ruby-devel: 4.0.6-36.fc44
+    rubygem-bundler: 4.0.16-36.fc44
+    xdg-utils: 1.2.1-5.fc44
+    golang: 1.26.5-1.fc44
+    docker-buildx-plugin: 0.36.1-1.fc44
+    docker-ce-cli: 1:29.7.2-1.fc44
+    docker-compose-plugin: 5.4.0-1.fc44
+    development-tools:
+      members:
+        - name: gettext
+          version: 0.26-5.fc44
+        - name: diffstat
+          version: 1.69-1.fc44
+        - name: doxygen
+          version: 2:1.16.1-3.fc44
+        - name: git
+          version: 2.55.0-1.fc44
+        - name: patch
+          version: 2.8-4.fc44
+        - name: patchutils
+          version: 0.4.4-3.fc44
+        - name: subversion
+          version: 1.14.5-26.fc44
+        - name: systemtap
+          version: 5.5-1.fc44
+  scripts/packages/npm/versions.sh:
+    corepack: 0.35.0
+  scripts/packages/gosu/versions.sh:
+    gosu: "1.19"
+  scripts/packages/gradle/versions.sh:
+    gradle: 9.7.0
+  scripts/packages/jdk/versions.sh:
+    jdk: "25"
+  scripts/packages/node/versions.sh:
+    node: 24.19.0
+  scripts/packages/pip/versions.sh:
+    pip: 26.2.1
+    setuptools: 84.0.0
+    wheel: 0.48.0
+  scripts/packages/rust/versions.sh:
+    rust: 1.97.1
+    rustup: 1.29.0
+  scripts/packages/pipx/versions.sh:
+    uv: 0.12.3

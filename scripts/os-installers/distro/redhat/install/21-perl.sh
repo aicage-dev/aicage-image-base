@@ -2,4 +2,4 @@
 set -euo pipefail
 
 dnf -y install \
-  perl
+  "${AICAGE_PACKAGE_PERL_INSTALL:-perl}"

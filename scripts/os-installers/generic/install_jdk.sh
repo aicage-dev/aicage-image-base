@@ -30,10 +30,13 @@ curl_wrapper() {
     "$@"
 }
 
-jdk_version="$(
-  curl_wrapper "https://api.adoptium.net/v3/info/available_releases?cb=$(date +%s)" |
-    jq -r '.available_lts_releases | max'
-)"
+jdk_version="${AICAGE_PACKAGE_JDK_INSTALL:-}"
+if [[ -z "${jdk_version}" ]]; then
+  jdk_version="$(
+    curl_wrapper "https://api.adoptium.net/v3/info/available_releases?cb=$(date +%s)" |
+      jq -r '.available_lts_releases | max'
+  )"
+fi
 
 if [[ -z "${jdk_version}" || "${jdk_version}" == "null" ]]; then
   echo "Unable to resolve latest JDK version" >&2

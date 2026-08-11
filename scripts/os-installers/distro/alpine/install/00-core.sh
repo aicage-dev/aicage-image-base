@@ -1,37 +1,38 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# shellcheck disable=SC2086
 apk add --no-cache \
-  bash \
-  bash-completion \
-  bats \
-  bind-tools \
-  ca-certificates \
-  curl \
-  file \
-  git \
-  gnupg \
-  imagemagick \
-  iproute2 \
-  jq \
-  less \
-  nano \
-  netcat-openbsd \
-  openssh-client \
-  p7zip \
-  patch \
-  procps \
-  ripgrep \
-  rsync \
-  shadow \
-  tar \
-  time \
-  tini \
-  tree \
-  tzdata \
-  unzip \
-  xz \
-  yq \
-  zip
+  ${AICAGE_PACKAGE_BASH_INSTALL:-bash} \
+  ${AICAGE_PACKAGE_BASH_COMPLETION_INSTALL:-bash-completion} \
+  ${AICAGE_PACKAGE_BATS_INSTALL:-bats} \
+  ${AICAGE_PACKAGE_BIND_TOOLS_INSTALL:-bind-tools} \
+  ${AICAGE_PACKAGE_CA_CERTIFICATES_INSTALL:-ca-certificates} \
+  ${AICAGE_PACKAGE_CURL_INSTALL:-curl} \
+  ${AICAGE_PACKAGE_FILE_INSTALL:-file} \
+  ${AICAGE_PACKAGE_GIT_INSTALL:-git} \
+  ${AICAGE_PACKAGE_GNUPG_INSTALL:-gnupg} \
+  ${AICAGE_PACKAGE_IMAGEMAGICK_INSTALL:-imagemagick} \
+  ${AICAGE_PACKAGE_IPROUTE2_INSTALL:-iproute2} \
+  ${AICAGE_PACKAGE_JQ_INSTALL:-jq} \
+  ${AICAGE_PACKAGE_LESS_INSTALL:-less} \
+  ${AICAGE_PACKAGE_NANO_INSTALL:-nano} \
+  ${AICAGE_PACKAGE_NETCAT_OPENBSD_INSTALL:-netcat-openbsd} \
+  ${AICAGE_PACKAGE_OPENSSH_CLIENT_INSTALL:-openssh-client} \
+  ${AICAGE_PACKAGE_P7ZIP_INSTALL:-p7zip} \
+  ${AICAGE_PACKAGE_PATCH_INSTALL:-patch} \
+  ${AICAGE_PACKAGE_PROCPS_INSTALL:-procps} \
+  ${AICAGE_PACKAGE_RIPGREP_INSTALL:-ripgrep} \
+  ${AICAGE_PACKAGE_RSYNC_INSTALL:-rsync} \
+  ${AICAGE_PACKAGE_SHADOW_INSTALL:-shadow} \
+  ${AICAGE_PACKAGE_TAR_INSTALL:-tar} \
+  ${AICAGE_PACKAGE_TIME_INSTALL:-time} \
+  ${AICAGE_PACKAGE_TINI_INSTALL:-tini} \
+  ${AICAGE_PACKAGE_TREE_INSTALL:-tree} \
+  ${AICAGE_PACKAGE_TZDATA_INSTALL:-tzdata} \
+  ${AICAGE_PACKAGE_UNZIP_INSTALL:-unzip} \
+  ${AICAGE_PACKAGE_XZ_INSTALL:-xz} \
+  ${AICAGE_PACKAGE_YQ_INSTALL:-yq} \
+  ${AICAGE_PACKAGE_ZIP_INSTALL:-zip}
 
 update-ca-certificates >/dev/null 2>&1

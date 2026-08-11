@@ -54,7 +54,10 @@ curl_wrapper() {
 }
 
 if ! command -v tini >/dev/null 2>&1; then
-  TINI_VERSION="$(curl_wrapper https://api.github.com/repos/krallin/tini/releases/latest | jq -r '.tag_name')"
+  TINI_VERSION="${AICAGE_PACKAGE_TINI_INSTALL:-}"
+  if [[ -z "${TINI_VERSION}" ]]; then
+    TINI_VERSION="$(curl_wrapper https://api.github.com/repos/krallin/tini/releases/latest | jq -r '.tag_name')"
+  fi
   curl_wrapper "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static-${TINI_ARCH}" \
     -o /usr/local/bin/tini
   chmod +x /usr/local/bin/tini

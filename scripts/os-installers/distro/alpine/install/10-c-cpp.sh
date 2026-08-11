@@ -1,24 +1,25 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# shellcheck disable=SC2086
 apk add --no-cache \
-  autoconf \
-  automake \
-  bison \
-  build-base \
-  clang \
-  cmake \
-  flex \
-  gdb \
-  gettext \
-  gawk \
-  lld \
-  lldb \
-  libtool \
-  ltrace \
-  ninja \
-  openssl-dev \
-  pkgconf \
-  strace \
-  valgrind \
-  zlib-dev
+  "${AICAGE_PACKAGE_AUTOCONF_INSTALL:-autoconf}" \
+  "${AICAGE_PACKAGE_AUTOMAKE_INSTALL:-automake}" \
+  "${AICAGE_PACKAGE_BISON_INSTALL:-bison}" \
+  "${AICAGE_PACKAGE_BUILD_BASE_INSTALL:-build-base}" \
+  ${AICAGE_PACKAGE_CLANG_INSTALL:-clang} \
+  "${AICAGE_PACKAGE_CMAKE_INSTALL:-cmake}" \
+  "${AICAGE_PACKAGE_FLEX_INSTALL:-flex}" \
+  "${AICAGE_PACKAGE_GDB_INSTALL:-gdb}" \
+  "${AICAGE_PACKAGE_GETTEXT_INSTALL:-gettext}" \
+  "${AICAGE_PACKAGE_GAWK_INSTALL:-gawk}" \
+  ${AICAGE_PACKAGE_LLD_INSTALL:-lld} \
+  "${AICAGE_PACKAGE_LLDB_INSTALL:-lldb}" \
+  "${AICAGE_PACKAGE_LIBTOOL_INSTALL:-libtool}" \
+  "${AICAGE_PACKAGE_LTRACE_INSTALL:-ltrace}" \
+  ${AICAGE_PACKAGE_NINJA_INSTALL:-ninja} \
+  "${AICAGE_PACKAGE_OPENSSL_DEV_INSTALL:-openssl-dev}" \
+  "${AICAGE_PACKAGE_PKGCONF_INSTALL:-pkgconf}" \
+  "${AICAGE_PACKAGE_STRACE_INSTALL:-strace}" \
+  "${AICAGE_PACKAGE_VALGRIND_INSTALL:-valgrind}" \
+  "${AICAGE_PACKAGE_ZLIB_DEV_INSTALL:-zlib-dev}"

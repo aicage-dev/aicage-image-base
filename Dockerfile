@@ -6,6 +6,7 @@ FROM ${FROM_IMAGE} AS from_image
 
 ARG IMAGE_SOURCE_URL
 ARG OS_INSTALLER
+ARG PACKAGE_ENV_FILE
 
 LABEL org.opencontainers.image.title="aicage-image-base" \
       org.opencontainers.image.description="Prebuilt base layer for agent images" \
@@ -22,6 +23,12 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 RUN --mount=type=bind,source=scripts/os-installers,target=/tmp/aicage/scripts/os-installers,readonly \
     --mount=type=bind,source=scripts/entrypoint.sh,target=/tmp/aicage/scripts/entrypoint.sh,readonly \
+    --mount=type=bind,source=${PACKAGE_ENV_FILE},target=/tmp/aicage/package.env,readonly \
+    if [ -f /tmp/aicage/package.env ]; then \
+      set -a; \
+      . /tmp/aicage/package.env; \
+      set +a; \
+    fi && \
     /tmp/aicage/scripts/os-installers/${OS_INSTALLER} && \
     cp /tmp/aicage/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
 

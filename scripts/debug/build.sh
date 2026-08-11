@@ -63,12 +63,23 @@ OS_INSTALLER_PATH="${ROOT_DIR}/scripts/os-installers/${OS_INSTALLER}"
 IMAGE_SOURCE_URL="$(get_image_base_source_url)"
 [[ -f "${OS_INSTALLER_PATH}" ]] || die "OS installer not found for '${BASE_ALIAS}': ${OS_INSTALLER}"
 
+case "$(uname -m)" in
+  x86_64) HOST_ARCH="amd64" ;;
+  aarch64 | arm64) HOST_ARCH="arm64" ;;
+  *) die "Unsupported host architecture: $(uname -m)" ;;
+esac
+
+PACKAGE_ENV_FILE="${ROOT_DIR}/package-versions/${BASE_ALIAS}/${HOST_ARCH}.env"
+[[ -f "${PACKAGE_ENV_FILE}" ]] || die "Package env file not found: ${PACKAGE_ENV_FILE}"
+PACKAGE_ENV_BUILD_PATH="package-versions/${BASE_ALIAS}/${HOST_ARCH}.env"
+
 VERSION_TAG="$(get_image_base_ref):${BASE_ALIAS}-${AICAGE_VERSION}"
 LATEST_TAG="$(get_image_base_ref):${BASE_ALIAS}"
 
 (
   echo "UpstreamBase=${FROM_IMAGE}"
   echo "Installer=${OS_INSTALLER}"
+  echo "PackageEnv=${PACKAGE_ENV_FILE}"
   echo "Tags=${VERSION_TAG},${LATEST_TAG}"
 ) >&2
 
@@ -76,6 +87,7 @@ docker build \
   --build-arg "FROM_IMAGE=${FROM_IMAGE}" \
   --build-arg "IMAGE_SOURCE_URL=${IMAGE_SOURCE_URL}" \
   --build-arg "OS_INSTALLER=${OS_INSTALLER}" \
+  --build-arg "PACKAGE_ENV_FILE=${PACKAGE_ENV_BUILD_PATH}" \
   --tag "${VERSION_TAG}" \
   --tag "${LATEST_TAG}" \
   --label "org.opencontainers.image.description=Base image for aicage (${BASE_ALIAS})" \

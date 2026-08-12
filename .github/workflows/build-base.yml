@@ -156,7 +156,6 @@ jobs:
           context: .
           push: true
           provenance: mode=max
-          sbom: true
           build-args: |
             FROM_IMAGE=${{ env.FROM_IMAGE }}
             IMAGE_SOURCE_URL=${{ env.IMAGE_SOURCE_URL }}

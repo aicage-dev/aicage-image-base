@@ -1,7 +1,73 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-generic_dir="${script_dir}/../../../generic"
+if command -v gradle >/dev/null 2>&1; then
+  exit 0
+fi
 
-"${generic_dir}/install_gradle.sh"
+# add retry and other params to reduce failure in pipelines
+curl_wrapper() {
+  curl -fsSL \
+    --retry 8 \
+    --retry-all-errors \
+    --retry-delay 2 \
+    --max-time 600 \
+    "$@"
+}
+
+gradle_version="${AICAGE_PACKAGE_GRADLE_INSTALL:-}"
+gradle_version="${gradle_version#*=}"
+if [[ -n "${gradle_version}" ]]; then
+  download_url="https://services.gradle.org/distributions/gradle-${gradle_version}-bin.zip"
+  checksum_url="${download_url}.sha256"
+else
+  gradle_json="$(curl_wrapper https://services.gradle.org/versions/current)"
+  gradle_version="$(echo "${gradle_json}" | jq -r '.version')"
+  download_url="$(echo "${gradle_json}" | jq -r '.downloadUrl')"
+  checksum_url="$(echo "${gradle_json}" | jq -r '.checksumUrl')"
+fi
+
+if [[ -z "${gradle_version}" || "${gradle_version}" == "null" ]]; then
+  echo "Unable to resolve Gradle version" >&2
+  exit 1
+fi
+
+if [[ -z "${download_url}" || "${download_url}" == "null" ]]; then
+  echo "Unable to resolve Gradle download URL" >&2
+  exit 1
+fi
+
+tmp_dir="$(mktemp -d)"
+trap 'rm -rf "${tmp_dir}"' EXIT
+
+archive_path="${tmp_dir}/gradle.zip"
+
+# add retry and other params to reduce failure in pipelines
+curl_wrapper() {
+  curl -fsSL \
+    --retry 8 \
+    --retry-all-errors \
+    --retry-delay 2 \
+    --max-time 600 \
+    "$@"
+}
+
+curl_wrapper "${download_url}" -o "${archive_path}"
+
+if [[ -n "${checksum_url}" && "${checksum_url}" != "null" ]]; then
+  checksum="$(curl_wrapper "${checksum_url}")"
+  echo "${checksum}  ${archive_path}" | sha256sum -c -
+fi
+
+install_root="/opt/gradle"
+mkdir -p "${install_root}"
+unzip -q "${archive_path}" -d "${install_root}"
+
+gradle_home="${install_root}/gradle-${gradle_version}"
+ln -sfn "${gradle_home}" "${install_root}/latest"
+ln -sf "${install_root}/latest/bin/gradle" /usr/local/bin/gradle
+
+cat >/etc/profile.d/gradle.sh <<'GRADLE'
+export GRADLE_HOME=/opt/gradle/latest
+export PATH="$GRADLE_HOME/bin:$PATH"
+GRADLE

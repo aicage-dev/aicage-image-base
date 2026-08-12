@@ -57,7 +57,8 @@ done
 
 load_config_file
 
-FROM_IMAGE="$(get_base_field "${BASE_ALIAS}" from_image)"
+FROM_IMAGE="$(get_base_from_image "${BASE_ALIAS}")"
+FROM_IMAGE_SOURCE="$(get_base_field "${BASE_ALIAS}" from_image)"
 OS_INSTALLER="$(get_base_build_field "${BASE_ALIAS}" os_installer)"
 OS_INSTALLER_PATH="${ROOT_DIR}/scripts/os-installers/${OS_INSTALLER}"
 IMAGE_SOURCE_URL="$(get_image_base_source_url)"
@@ -77,7 +78,8 @@ VERSION_TAG="$(get_image_base_ref):${BASE_ALIAS}-${AICAGE_VERSION}"
 LATEST_TAG="$(get_image_base_ref):${BASE_ALIAS}"
 
 (
-  echo "UpstreamBase=${FROM_IMAGE}"
+  echo "UpstreamBase=${FROM_IMAGE_SOURCE}"
+  echo "ResolvedBase=${FROM_IMAGE}"
   echo "Installer=${OS_INSTALLER}"
   echo "PackageEnv=${PACKAGE_ENV_FILE}"
   echo "Tags=${VERSION_TAG},${LATEST_TAG}"

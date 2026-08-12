@@ -82,6 +82,18 @@ get_base_field() {
   _read_yaml_field "${alias}" "${field}" base.yml
 }
 
+get_base_from_image() {
+  local alias="$1"
+  local lock_file="${BASE_DEFINITIONS_DIR}/${alias}/from-image.env"
+
+  [[ -f "${lock_file}" ]] || _die "FROM image env file not found: ${lock_file}"
+
+  # shellcheck source=/dev/null
+  source "${lock_file}"
+  [[ -n "${AICAGE_FROM_IMAGE:-}" ]] || _die "AICAGE_FROM_IMAGE missing in ${lock_file}"
+  printf '%s\n' "${AICAGE_FROM_IMAGE}"
+}
+
 get_base_build_field() {
   local alias="$1"
   local field="$2"

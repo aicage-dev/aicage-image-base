@@ -22,6 +22,7 @@ pip install -r requirements-dev.txt
 
 - `bases/<alias>/base.yml` — Defines the upstream image and installer for each base.
 - `bases/<alias>/packages/packages.yml` — Lists packages and tool resolvers for the base.
+- `bases/<alias>/from-image.env` — Resolved upstream image digest for the base.
 - `bases/<alias>/packages/<arch>.{yml,env}` — Resolved package versions for one architecture.
 - `Dockerfile` — Docker build entrypoint.
 - `scripts/` — Build/test helpers.
@@ -85,9 +86,10 @@ Smoke suites live in `tests/bases/smoke/` (including subfolders); run individual
 
 1. Create `bases/<alias>/base.yml` with `from_image` and `os_installer`.
 2. Create `bases/<alias>/packages/packages.yml` with the base package list.
-3. Add or adjust installer scripts if the base needs extra setup.
-4. Update smoke coverage under `tests/bases/smoke/` if the new base requires validation.
-5. Document the new base in `README.md` if it should be visible to users.
+3. Run `scripts/from-images/resolve.sh <alias>` to pin the upstream image digest.
+4. Add or adjust installer scripts if the base needs extra setup.
+5. Update smoke coverage under `tests/bases/smoke/` if the new base requires validation.
+6. Document the new base in `README.md` if it should be visible to users.
 
 ## CI
 

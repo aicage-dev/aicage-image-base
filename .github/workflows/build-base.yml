@@ -136,7 +136,7 @@ jobs:
             echo "IMAGE_LATEST_TAG=${IMAGE_LATEST_TAG}"
             echo "IMAGE_TEST_TAG=${IMAGE_TEST_TAG}"
             echo "IMAGE_SOURCE_URL=${IMAGE_SOURCE_URL}"
-            echo "FROM_IMAGE=$(get_base_field "${BASE_ALIAS}" from_image)"
+            echo "FROM_IMAGE=$(get_base_from_image "${BASE_ALIAS}")"
             echo "OS_INSTALLER=$(get_base_build_field "${BASE_ALIAS}" os_installer)"
           } >> "$GITHUB_OUTPUT"
           {
@@ -145,7 +145,7 @@ jobs:
             echo "IMAGE_LATEST_TAG=${IMAGE_LATEST_TAG}"
             echo "IMAGE_TEST_TAG=${IMAGE_TEST_TAG}"
             echo "IMAGE_SOURCE_URL=${IMAGE_SOURCE_URL}"
-            echo "FROM_IMAGE=$(get_base_field "${BASE_ALIAS}" from_image)"
+            echo "FROM_IMAGE=$(get_base_from_image "${BASE_ALIAS}")"
             echo "OS_INSTALLER=$(get_base_build_field "${BASE_ALIAS}" os_installer)"
           } >> "$GITHUB_ENV"
 

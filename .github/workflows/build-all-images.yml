@@ -2,9 +2,6 @@ name: Build All Base Images (Latest Release Ref)
 run-name: Dispatch build-all-images-worker.yml at latest release tag
 
 "on":
-  # Weekly on Tuesday at 02:08 UTC
-  schedule:
-    - cron: "8 2 * * 2"
   workflow_dispatch: {}
 
 permissions:
@@ -46,4 +43,7 @@ jobs:
           TAG: ${{ steps.latest.outputs.AICAGE_VERSION }}
         run: |
           set -euo pipefail
-          gh workflow run build-all-images-worker.yml --ref "${TAG}"  --repo "${GITHUB_REPOSITORY}"
+          gh workflow run build-all-images-worker.yml \
+            --ref "${TAG}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            -f "git_ref=${TAG}"

@@ -1,0 +1,281 @@
+name: Update Base Locks Worker
+run-name: Update base locks (${{ github.ref_name }})
+
+"on":
+  workflow_call:
+    inputs:
+      base_version:
+        description: Release version backing this release branch
+        required: true
+        type: string
+      release_branch:
+        description: Release branch receiving lock updates
+        required: false
+        type: string
+    outputs:
+      refresh_tag:
+        description: Refresh tag created for the resolved locks
+        value: ${{ jobs.commit.outputs.REFRESH_TAG }}
+      refresh_sha:
+        description: Commit SHA referenced by the refresh tag
+        value: ${{ jobs.commit.outputs.REFRESH_SHA }}
+  workflow_dispatch:
+    inputs:
+      base_version:
+        description: Release version backing this release branch
+        required: true
+        type: string
+      release_branch:
+        description: Release branch receiving lock updates
+        required: false
+        type: string
+
+concurrency:
+  group: update-base-locks-${{ github.ref_name }}
+  cancel-in-progress: false
+
+permissions:
+  actions: read
+  contents: read
+
+env:
+  RUNNER_AMD64: ubuntu-latest
+  RUNNER_ARM64: ubuntu-24.04-arm
+
+jobs:
+  matrix:
+    name: Prepare base lock matrix
+    runs-on: ubuntu-latest
+    env:
+      ROOT_DIR: ${{ github.workspace }}
+    outputs:
+      BASE_MATRIX: ${{ steps.matrix.outputs.BASE_MATRIX }}
+      PACKAGE_MATRIX: ${{ steps.matrix.outputs.PACKAGE_MATRIX }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Generate matrix
+        id: matrix
+        run: |
+          set -euo pipefail
+          source scripts/common.sh
+          load_config_file
+
+          base_matrix_file="$(mktemp)"
+          package_matrix_file="$(mktemp)"
+          echo '{"include":[]}' >"${base_matrix_file}"
+          echo '{"include":[]}' >"${package_matrix_file}"
+
+          while IFS= read -r base_alias; do
+            jq -c \
+              --arg base "${base_alias}" \
+              '.include += [{"base": $base}]' \
+              "${base_matrix_file}" >"${base_matrix_file}.tmp"
+            mv "${base_matrix_file}.tmp" "${base_matrix_file}"
+
+            base_matrix="$(BASE_ALIAS="${base_alias}" scripts/ci/base-build-matrix.sh)"
+            jq -c \
+              --arg base "${base_alias}" \
+              --argjson base_matrix "${base_matrix}" \
+              '.include += ($base_matrix.include | map(. + {"base": $base}))' \
+              "${package_matrix_file}" >"${package_matrix_file}.tmp"
+            mv "${package_matrix_file}.tmp" "${package_matrix_file}"
+          done < <(list_configured_bases)
+
+          printf 'BASE_MATRIX=%s\n' "$(cat "${base_matrix_file}")" >>"${GITHUB_OUTPUT}"
+          printf 'PACKAGE_MATRIX=%s\n' "$(cat "${package_matrix_file}")" >>"${GITHUB_OUTPUT}"
+
+  from-images:
+    name: "${{ matrix.base }}: Resolve FROM image"
+    needs: matrix
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.matrix.outputs.BASE_MATRIX) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install resolver dependencies
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+          python -m pip uninstall -y yq
+
+      - name: Resolve FROM image
+        env:
+          BASE_ALIAS: ${{ matrix.base }}
+        run: |
+          set -euo pipefail
+          scripts/from-images/resolve.sh "${BASE_ALIAS}"
+
+      - name: Prepare FROM image artifact
+        env:
+          BASE_ALIAS: ${{ matrix.base }}
+        run: |
+          set -euo pipefail
+          mkdir -p "from-image-artifact/bases/${BASE_ALIAS}"
+          cp "bases/${BASE_ALIAS}/from-image.env" "from-image-artifact/bases/${BASE_ALIAS}/"
+
+      - name: Upload FROM image
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        with:
+          name: from-image-${{ matrix.base }}
+          path: from-image-artifact/bases
+
+  resolve:
+    name: "${{ matrix.base }}/${{ matrix.arch }}: Resolve package versions"
+    needs: matrix
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.matrix.outputs.PACKAGE_MATRIX) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install resolver dependencies
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+          python -m pip uninstall -y yq
+
+      - name: Resolve package versions
+        env:
+          BASE_ALIAS: ${{ matrix.base }}
+        run: |
+          set -euo pipefail
+          scripts/packages/resolve.sh "${BASE_ALIAS}"
+
+      - name: Prepare package version artifact
+        env:
+          ARCH: ${{ matrix.arch }}
+          BASE_ALIAS: ${{ matrix.base }}
+        run: |
+          set -euo pipefail
+          mkdir -p "package-version-artifact/bases/${BASE_ALIAS}/packages"
+          cp \
+            "bases/${BASE_ALIAS}/packages/${ARCH}.yml" \
+            "bases/${BASE_ALIAS}/packages/${ARCH}.env" \
+            "package-version-artifact/bases/${BASE_ALIAS}/packages/"
+
+      - name: Upload package versions
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        with:
+          name: package-versions-${{ matrix.base }}-${{ matrix.arch }}
+          path: package-version-artifact/bases
+
+  commit:
+    name: Commit base lock updates
+    needs:
+      - from-images
+      - resolve
+    permissions:
+      actions: write
+      contents: write
+    runs-on: ubuntu-latest
+    env:
+      BASE_VERSION: ${{ inputs.base_version }}
+      RELEASE_BRANCH: ${{ inputs.release_branch || github.ref_name }}
+    outputs:
+      REFRESH_TAG: ${{ steps.prepare-commit.outputs.UPDATE_TAG }}
+      REFRESH_SHA: ${{ steps.resolve-refresh-sha.outputs.REFRESH_SHA }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Download resolved versions
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c  # v8.0.1
+        with:
+          pattern: "*"
+          path: bases
+          merge-multiple: true
+
+      - name: Prepare base lock commit
+        id: prepare-commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          lock_paths=(bases/*/from-image.env bases/*/packages)
+
+          update_tag="${BASE_VERSION}-$(date -u +%Y%m%dT%H%M)"
+          if git ls-remote --exit-code --tags origin "refs/tags/${update_tag}" >/dev/null; then
+            echo "Tag ${update_tag} already exists." >&2
+            exit 1
+          fi
+          echo "UPDATE_TAG=${update_tag}" >>"${GITHUB_OUTPUT}"
+
+          if [[ -z "$(git status --porcelain -- "${lock_paths[@]}")" ]]; then
+            echo "No base lock changes detected."
+            echo "HAS_CHANGES=false" >>"${GITHUB_OUTPUT}"
+            echo "HEAD_OID=$(git rev-parse HEAD)" >>"${GITHUB_OUTPUT}"
+            exit 0
+          fi
+          echo "HAS_CHANGES=true" >>"${GITHUB_OUTPUT}"
+
+      - name: Commit base lock updates
+        id: commit-locks
+        if: steps.prepare-commit.outputs.HAS_CHANGES == 'true'
+        uses: IAreKyleW00t/verified-bot-commit@1ccc6afd0f789e8442cff7deec3e9856a693cc7e  # v2.3.4
+        with:
+          message: Update base locks
+          ref: refs/heads/${{ env.RELEASE_BRANCH }}
+          token: ${{ github.token }}
+          files: |
+            bases/*/from-image.env
+            bases/*/packages/**
+
+      - name: Tag base lock update
+        if: steps.prepare-commit.outputs.HAS_CHANGES == 'true'
+        env:
+          COMMIT_OID: ${{ steps.commit-locks.outputs.commit }}
+          GH_TOKEN: ${{ github.token }}
+          UPDATE_TAG: ${{ steps.prepare-commit.outputs.UPDATE_TAG }}
+        run: |
+          set -euo pipefail
+          gh api \
+            --method POST \
+            "repos/${GITHUB_REPOSITORY}/git/refs" \
+            -f "ref=refs/tags/${UPDATE_TAG}" \
+            -f "sha=${COMMIT_OID}"
+
+      - name: Tag unchanged base locks
+        if: steps.prepare-commit.outputs.HAS_CHANGES == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_OID: ${{ steps.prepare-commit.outputs.HEAD_OID }}
+          UPDATE_TAG: ${{ steps.prepare-commit.outputs.UPDATE_TAG }}
+        run: |
+          set -euo pipefail
+          gh api \
+            --method POST \
+            "repos/${GITHUB_REPOSITORY}/git/refs" \
+            -f "ref=refs/tags/${UPDATE_TAG}" \
+            -f "sha=${HEAD_OID}"
+
+      - name: Resolve refresh SHA
+        id: resolve-refresh-sha
+        env:
+          COMMIT_OID: ${{ steps.commit-locks.outputs.commit }}
+          HAS_CHANGES: ${{ steps.prepare-commit.outputs.HAS_CHANGES }}
+          HEAD_OID: ${{ steps.prepare-commit.outputs.HEAD_OID }}
+        run: |
+          set -euo pipefail
+          if [[ "${HAS_CHANGES}" == "true" ]]; then
+            echo "REFRESH_SHA=${COMMIT_OID}" >>"${GITHUB_OUTPUT}"
+          else
+            echo "REFRESH_SHA=${HEAD_OID}" >>"${GITHUB_OUTPUT}"
+          fi

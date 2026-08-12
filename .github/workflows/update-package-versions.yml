@@ -1,184 +1,64 @@
 name: Update Base Locks
-run-name: Update base locks
+run-name: Dispatch update-package-versions-worker.yml at latest release branch
 
 "on":
-  # Daily at 03:17 UTC
+  # Weekly on Tuesday at 02:08 UTC
   schedule:
-    - cron: "17 3 * * *"
+    - cron: "8 2 * * 2"
   workflow_dispatch: {}
 
-concurrency:
-  group: update-base-locks
-  cancel-in-progress: false
-
 permissions:
-  actions: read
+  actions: write
   contents: read
 
-env:
-  RUNNER_AMD64: ubuntu-latest
-  RUNNER_ARM64: ubuntu-24.04-arm
-
 jobs:
-  matrix:
-    name: Prepare base lock matrix
-    runs-on: ubuntu-latest
-    env:
-      ROOT_DIR: ${{ github.workspace }}
-    outputs:
-      BASE_MATRIX: ${{ steps.matrix.outputs.BASE_MATRIX }}
-      PACKAGE_MATRIX: ${{ steps.matrix.outputs.PACKAGE_MATRIX }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
-        with:
-          persist-credentials: false
 
-      - name: Generate matrix
-        id: matrix
-        run: |
-          set -euo pipefail
-          source scripts/common.sh
-          load_config_file
-
-          base_matrix_file="$(mktemp)"
-          package_matrix_file="$(mktemp)"
-          echo '{"include":[]}' >"${base_matrix_file}"
-          echo '{"include":[]}' >"${package_matrix_file}"
-
-          while IFS= read -r base_alias; do
-            jq -c \
-              --arg base "${base_alias}" \
-              '.include += [{"base": $base}]' \
-              "${base_matrix_file}" >"${base_matrix_file}.tmp"
-            mv "${base_matrix_file}.tmp" "${base_matrix_file}"
-
-            base_matrix="$(BASE_ALIAS="${base_alias}" scripts/ci/base-build-matrix.sh)"
-            jq -c \
-              --arg base "${base_alias}" \
-              --argjson base_matrix "${base_matrix}" \
-              '.include += ($base_matrix.include | map(. + {"base": $base}))' \
-              "${package_matrix_file}" >"${package_matrix_file}.tmp"
-            mv "${package_matrix_file}.tmp" "${package_matrix_file}"
-          done < <(list_configured_bases)
-
-          printf 'BASE_MATRIX=%s\n' "$(cat "${base_matrix_file}")" >>"${GITHUB_OUTPUT}"
-          printf 'PACKAGE_MATRIX=%s\n' "$(cat "${package_matrix_file}")" >>"${GITHUB_OUTPUT}"
-
-  from-images:
-    name: "${{ matrix.base }}: Resolve FROM image"
-    needs: matrix
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJson(needs.matrix.outputs.BASE_MATRIX) }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
-        with:
-          persist-credentials: false
-
-      - name: Install resolver dependencies
-        run: |
-          set -euo pipefail
-          python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
-          python -m pip uninstall -y yq
-
-      - name: Resolve FROM image
-        env:
-          BASE_ALIAS: ${{ matrix.base }}
-        run: |
-          set -euo pipefail
-          scripts/from-images/resolve.sh "${BASE_ALIAS}"
-
-      - name: Prepare FROM image artifact
-        env:
-          BASE_ALIAS: ${{ matrix.base }}
-        run: |
-          set -euo pipefail
-          mkdir -p "from-image-artifact/bases/${BASE_ALIAS}"
-          cp "bases/${BASE_ALIAS}/from-image.env" "from-image-artifact/bases/${BASE_ALIAS}/"
-
-      - name: Upload FROM image
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
-        with:
-          name: from-image-${{ matrix.base }}
-          path: from-image-artifact/bases
-
-  resolve:
-    name: "${{ matrix.base }}/${{ matrix.arch }}: Resolve package versions"
-    needs: matrix
-    runs-on: ${{ matrix.runner }}
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJson(needs.matrix.outputs.PACKAGE_MATRIX) }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
-        with:
-          persist-credentials: false
-
-      - name: Install resolver dependencies
-        run: |
-          set -euo pipefail
-          python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
-          python -m pip uninstall -y yq
-
-      - name: Resolve package versions
-        env:
-          BASE_ALIAS: ${{ matrix.base }}
-        run: |
-          set -euo pipefail
-          scripts/packages/resolve.sh "${BASE_ALIAS}"
-
-      - name: Prepare package version artifact
-        env:
-          ARCH: ${{ matrix.arch }}
-          BASE_ALIAS: ${{ matrix.base }}
-        run: |
-          set -euo pipefail
-          mkdir -p "package-version-artifact/bases/${BASE_ALIAS}/packages"
-          cp \
-            "bases/${BASE_ALIAS}/packages/${ARCH}.yml" \
-            "bases/${BASE_ALIAS}/packages/${ARCH}.env" \
-            "package-version-artifact/bases/${BASE_ALIAS}/packages/"
-
-      - name: Upload package versions
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
-        with:
-          name: package-versions-${{ matrix.base }}-${{ matrix.arch }}
-          path: package-version-artifact/bases
-
-  commit:
-    name: Commit base lock updates
-    needs:
-      - from-images
-      - resolve
-    permissions:
-      actions: read
-      contents: write
+  latest-release-branch:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
-        with:
-          fetch-depth: 0
-          persist-credentials: false
+      - name: Get latest release branch
+        id: latest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          latest_release_tag="$(
+            curl \
+              -fsSL \
+              --retry 8 \
+              --retry-all-errors \
+              --retry-delay 2 \
+              --max-time 300 \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/latest" \
+            | jq -r '.tag_name'
+          )"
+          if [[ -z "${latest_release_tag}" ]]; then
+            echo "Latest release tag is empty" >&2
+            exit 1
+          fi
 
-      - name: Download resolved versions
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c  # v8.0.1
-        with:
-          pattern: "*"
-          path: bases
-          merge-multiple: true
+          base_version="${latest_release_tag}"
+          if [[ "${latest_release_tag}" =~ ^(.+)-[0-9]{8}T[0-9]{4}$ ]]; then
+            base_version="${BASH_REMATCH[1]}"
+          fi
 
-      - name: Commit and push changes
-        uses: IAreKyleW00t/verified-bot-commit@1ccc6afd0f789e8442cff7deec3e9856a693cc7e  # v2.3.4
-        with:
-          message: Update base locks
-          files: |
-            bases/**/from-image.env
-            bases/**/packages/**
-          if-no-commit: info
+          {
+            echo "BASE_VERSION=${base_version}"
+            echo "RELEASE_BRANCH=release/${base_version}"
+          } >> "$GITHUB_OUTPUT"
+          echo "Latest release branch: release/${base_version}"
+
+      - name: Dispatch update-package-versions worker at release branch
+        env:
+          BASE_VERSION: ${{ steps.latest.outputs.BASE_VERSION }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_BRANCH: ${{ steps.latest.outputs.RELEASE_BRANCH }}
+        run: |
+          set -euo pipefail
+          gh workflow run update-package-versions-worker.yml \
+            --ref "${RELEASE_BRANCH}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            -f "base_version=${BASE_VERSION}" \
+            -f "release_branch=${RELEASE_BRANCH}"

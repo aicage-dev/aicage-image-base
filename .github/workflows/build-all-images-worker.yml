@@ -2,9 +2,18 @@ name: Build All Base Images
 run-name: Build all base images (${{ github.ref_name }})
 
 "on":
-  workflow_call: {}
+  workflow_call:
+    inputs:
+      git_ref:
+        description: Git ref to build
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
+      git_ref:
+        description: Git ref to build
+        required: true
+        type: string
       base:
         description: Base alias to build (matches bases/<alias>)
         required: false
@@ -23,7 +32,7 @@ jobs:
     uses: ./.github/workflows/lint.yml
 
   matrix:
-    name: Build matrix for ${{ github.ref_name }}
+    name: Build matrix for ${{ inputs.git_ref }}
     runs-on: ubuntu-latest
     env:
       INPUT_BASE: ${{ github.event.inputs.base }}
@@ -73,7 +82,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
   build:
-    name: Build ${{ matrix.base }} for ${{ github.ref_name }}
+    name: Build ${{ matrix.base }} for ${{ inputs.git_ref }}
     needs: [lint, matrix]
     permissions:
       contents: read
@@ -86,5 +95,5 @@ jobs:
     uses: ./.github/workflows/build-base.yml
     with:
       base: ${{ matrix.base }}
-      git_ref: ${{ github.ref_name }}
-      aicage_version: ${{ github.ref_name }}
+      git_ref: ${{ inputs.git_ref }}
+      aicage_version: ${{ inputs.git_ref }}

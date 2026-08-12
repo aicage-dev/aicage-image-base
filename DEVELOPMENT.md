@@ -95,3 +95,6 @@ Smoke suites live in `tests/bases/smoke/` (including subfolders); run individual
 
 `aicage-image-base/.github/workflows/build-<alias>.yml` builds and publishes base images (multi-arch)
 on tags, producing `<alias>-<version>` and `<alias>` tags.
+
+Release tags create a matching `release/<version>` branch. Scheduled base-lock refreshes run on that
+release branch, commit refreshed locks, and create tags named `<version>-<YYYYMMDD>T<HHMM>`.

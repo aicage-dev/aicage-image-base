@@ -6,5 +6,10 @@ exclude_path = [
     # in .lycheeignore or by "exclude" here does not work
     # lychee fails to parse them (?) and only excluding the files helps
     ".github/workflows/build-all-images.yml",
-    ".github/workflows/ghcr-cleanup.yml"
+    ".github/workflows/ghcr-cleanup.yml",
+    ".github/workflows/update-package-versions.yml"
+]
+
+exclude = [
+    "^https://x-access-token[:/]"
 ]

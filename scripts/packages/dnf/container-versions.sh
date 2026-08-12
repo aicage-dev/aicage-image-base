@@ -25,7 +25,7 @@ resolve_package() {
         --latest-limit=1 \
         --queryformat '%{name}|%{EVR}' \
         "${package}" 2>/dev/null |
-      head -1
+        head -1
     )"
   fi
 

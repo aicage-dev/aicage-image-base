@@ -2,12 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "AICAGE package versions",
   "type": "object",
-  "required": [
-    "distro",
-    "architecture",
-    "source",
-    "resolvers"
-  ],
+  "required": ["distro", "architecture", "source", "resolvers"],
   "properties": {
     "distro": {
       "type": "string",

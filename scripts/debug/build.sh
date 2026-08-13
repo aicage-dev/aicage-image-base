@@ -79,6 +79,7 @@ esac
 PACKAGE_ENV_FILE="${ROOT_DIR}/bases/${BASE_ALIAS}/packages/${HOST_ARCH}.env"
 [[ -f "${PACKAGE_ENV_FILE}" ]] || die "Package env file not found: ${PACKAGE_ENV_FILE}"
 PACKAGE_ENV_BUILD_PATH="bases/${BASE_ALIAS}/packages/${HOST_ARCH}.env"
+PACKAGE_ENV_BASE64="$(base64 <"${PACKAGE_ENV_FILE}" | tr -d '\n')"
 
 VERSION_TAG="$(get_image_base_ref):${BASE_ALIAS}-${AICAGE_VERSION}"
 LATEST_TAG="$(get_image_base_ref):${BASE_ALIAS}"
@@ -103,4 +104,5 @@ docker build \
   --tag "${VERSION_TAG}" \
   --tag "${LATEST_TAG}" \
   --label "org.opencontainers.image.description=Base image for aicage (${BASE_ALIAS})" \
+  --label "com.aicage.package-env.base64=${PACKAGE_ENV_BASE64}" \
   .

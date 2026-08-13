@@ -153,6 +153,14 @@ jobs:
             echo "POST_INSTALL=$(get_base_build_field "${BASE_ALIAS}" post_install)"
           } >> "$GITHUB_ENV"
 
+      - name: Resolve package env label
+        id: package_env_label
+        run: |
+          set -euo pipefail
+          package_env_file="bases/${BASE_ALIAS}/packages/${ARCH_SUFFIX}.env"
+          [[ -f "${package_env_file}" ]]
+          echo "PACKAGE_ENV_BASE64=$(base64 <"${package_env_file}" | tr -d '\n')" >> "$GITHUB_OUTPUT"
+
       - name: Build test image tag
         id: build_image
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a  # v7.3.0
@@ -174,6 +182,7 @@ jobs:
             org.opencontainers.image.revision=${{ steps.oci.outputs.revision }}
             org.opencontainers.image.created=${{ steps.oci.outputs.created }}
             org.opencontainers.image.version=${{ steps.oci.outputs.version }}
+            com.aicage.package-env.base64=${{ steps.package_env_label.outputs.PACKAGE_ENV_BASE64 }}
 
       - name: Prepare vars to remove test tag
         id: untag_vars
@@ -207,6 +216,7 @@ jobs:
           EXPECTED_REVISION: ${{ steps.oci.outputs.revision }}
           EXPECTED_CREATED: ${{ steps.oci.outputs.created }}
           EXPECTED_VERSION: ${{ steps.oci.outputs.version }}
+          EXPECTED_PACKAGE_ENV_BASE64: ${{ steps.package_env_label.outputs.PACKAGE_ENV_BASE64 }}
           IMAGE_DIGEST: ${{ steps.build_image.outputs.digest }}
         run: |
           set -euo pipefail
@@ -220,6 +230,7 @@ jobs:
               and .[0].Config.Labels["org.opencontainers.image.revision"] == $expected_revision
               and .[0].Config.Labels["org.opencontainers.image.created"] == $expected_created
               and .[0].Config.Labels["org.opencontainers.image.version"] == $expected_version
+              and .[0].Config.Labels["com.aicage.package-env.base64"] == env.EXPECTED_PACKAGE_ENV_BASE64
             ' >/dev/null
 
       - name: "Test: Setup BATS testing framework"

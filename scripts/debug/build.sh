@@ -60,9 +60,15 @@ load_config_file
 FROM_IMAGE="$(get_base_from_image "${BASE_ALIAS}")"
 FROM_IMAGE_SOURCE="$(get_base_field "${BASE_ALIAS}" from_image)"
 OS_INSTALLER="$(get_base_build_field "${BASE_ALIAS}" os_installer)"
+PRE_INSTALL="$(get_base_build_field "${BASE_ALIAS}" pre_install)"
+POST_INSTALL="$(get_base_build_field "${BASE_ALIAS}" post_install)"
 OS_INSTALLER_PATH="${ROOT_DIR}/scripts/os-installers/${OS_INSTALLER}"
+PRE_INSTALL_PATH="${ROOT_DIR}/scripts/os-installers/${PRE_INSTALL}"
+POST_INSTALL_PATH="${ROOT_DIR}/scripts/os-installers/${POST_INSTALL}"
 IMAGE_SOURCE_URL="$(get_image_base_source_url)"
 [[ -f "${OS_INSTALLER_PATH}" ]] || die "OS installer not found for '${BASE_ALIAS}': ${OS_INSTALLER}"
+[[ -f "${PRE_INSTALL_PATH}" ]] || die "Pre-install script not found for '${BASE_ALIAS}': ${PRE_INSTALL}"
+[[ -f "${POST_INSTALL_PATH}" ]] || die "Post-install script not found for '${BASE_ALIAS}': ${POST_INSTALL}"
 
 case "$(uname -m)" in
   x86_64) HOST_ARCH="amd64" ;;
@@ -80,7 +86,9 @@ LATEST_TAG="$(get_image_base_ref):${BASE_ALIAS}"
 (
   echo "UpstreamBase=${FROM_IMAGE_SOURCE}"
   echo "ResolvedBase=${FROM_IMAGE}"
+  echo "PreInstall=${PRE_INSTALL}"
   echo "Installer=${OS_INSTALLER}"
+  echo "PostInstall=${POST_INSTALL}"
   echo "PackageEnv=${PACKAGE_ENV_FILE}"
   echo "Tags=${VERSION_TAG},${LATEST_TAG}"
 ) >&2
@@ -88,7 +96,9 @@ LATEST_TAG="$(get_image_base_ref):${BASE_ALIAS}"
 docker build \
   --build-arg "FROM_IMAGE=${FROM_IMAGE}" \
   --build-arg "IMAGE_SOURCE_URL=${IMAGE_SOURCE_URL}" \
+  --build-arg "PRE_INSTALL=${PRE_INSTALL}" \
   --build-arg "OS_INSTALLER=${OS_INSTALLER}" \
+  --build-arg "POST_INSTALL=${POST_INSTALL}" \
   --build-arg "PACKAGE_ENV_FILE=${PACKAGE_ENV_BUILD_PATH}" \
   --tag "${VERSION_TAG}" \
   --tag "${LATEST_TAG}" \

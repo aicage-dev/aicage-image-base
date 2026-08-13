@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if command -v javac >/dev/null 2>&1; then
-  exit 0
-fi
-
 jdk_os="linux"
 . /etc/os-release
 if [[ "${ID:-}" == "alpine" ]]; then
@@ -42,6 +38,13 @@ fi
 if [[ -z "${jdk_version}" || "${jdk_version}" == "null" ]]; then
   echo "Unable to resolve latest JDK version" >&2
   exit 1
+fi
+
+if command -v javac >/dev/null 2>&1; then
+  installed_jdk_version="$(javac -version 2>&1 | awk '{print $2}')"
+  if [[ "${installed_jdk_version}" == "${jdk_version}" || "${installed_jdk_version}" == "${jdk_version}".* ]]; then
+    exit 0
+  fi
 fi
 
 jdk_json="$(

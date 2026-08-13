@@ -230,6 +230,13 @@ jobs:
             --image "${IMAGE_NAME}@${IMAGE_DIGEST}" \
             --base "${BASE_ALIAS}"
 
+      - name: Generate and attest SBOM
+        uses: gh-workflow/image-sbom@0f95d2aebf31efbe7c1dd8a7a3df86d5bc09164d  # v0.0.0-alpha02
+        with:
+          image: ${{ env.IMAGE_NAME }}@${{ steps.build_image.outputs.digest }}
+          registry-username: ${{ github.actor }}
+          registry-password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Export digest (amd64)
         id: out-amd64
         if: matrix.arch == 'amd64'

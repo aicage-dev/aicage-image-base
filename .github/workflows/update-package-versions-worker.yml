@@ -8,30 +8,31 @@ run-name: Update base locks (${{ github.ref_name }})
         description: Release version backing this release branch
         required: true
         type: string
-      release_branch:
-        description: Release branch receiving lock updates
-        required: false
-        type: string
-    outputs:
-      refresh_tag:
-        description: Refresh tag created for the resolved locks
-        value: ${{ jobs.commit.outputs.REFRESH_TAG }}
-      refresh_sha:
-        description: Commit SHA referenced by the refresh tag
-        value: ${{ jobs.commit.outputs.REFRESH_SHA }}
-  workflow_dispatch:
-    inputs:
-      base_version:
-        description: Release version backing this release branch
+      release_tag:
+        description: Current release tag for this release line
         required: true
         type: string
-      release_branch:
-        description: Release branch receiving lock updates
+      release_sha:
+        description: Current release tag commit SHA
         required: false
         type: string
+      release_branch:
+        description: Release branch receiving lock updates
+        required: true
+        type: string
+    outputs:
+      has_changes:
+        description: Whether base locks changed
+        value: ${{ jobs.commit.outputs.HAS_CHANGES }}
+      release_tag:
+        description: Tag to release after resolving base locks
+        value: ${{ jobs.commit.outputs.RELEASE_TAG }}
+      release_sha:
+        description: Commit SHA referenced by the release tag
+        value: ${{ jobs.commit.outputs.RELEASE_SHA }}
 
 concurrency:
-  group: update-base-locks-${{ github.ref_name }}
+  group: update-base-locks-${{ inputs.release_branch }}
   cancel-in-progress: false
 
 permissions:
@@ -55,6 +56,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
+          ref: ${{ inputs.release_branch }}
           persist-credentials: false
 
       - name: Generate matrix
@@ -99,6 +101,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
+          ref: ${{ inputs.release_branch }}
           persist-credentials: false
 
       - name: Install resolver dependencies
@@ -140,6 +143,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
+          ref: ${{ inputs.release_branch }}
           persist-credentials: false
 
       - name: Install resolver dependencies
@@ -180,19 +184,22 @@ jobs:
       - from-images
       - resolve
     permissions:
-      actions: write
       contents: write
     runs-on: ubuntu-latest
     env:
       BASE_VERSION: ${{ inputs.base_version }}
-      RELEASE_BRANCH: ${{ inputs.release_branch || github.ref_name }}
+      RELEASE_TAG: ${{ inputs.release_tag }}
+      RELEASE_SHA: ${{ inputs.release_sha }}
+      RELEASE_BRANCH: ${{ inputs.release_branch }}
     outputs:
-      REFRESH_TAG: ${{ steps.prepare-commit.outputs.UPDATE_TAG }}
-      REFRESH_SHA: ${{ steps.resolve-refresh-sha.outputs.REFRESH_SHA }}
+      HAS_CHANGES: ${{ steps.prepare-commit.outputs.HAS_CHANGES }}
+      RELEASE_TAG: ${{ steps.resolve-release-ref.outputs.RELEASE_TAG }}
+      RELEASE_SHA: ${{ steps.resolve-release-ref.outputs.RELEASE_SHA }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
+          ref: ${{ inputs.release_branch }}
           fetch-depth: 0
           persist-credentials: false
 
@@ -211,19 +218,20 @@ jobs:
           set -euo pipefail
           lock_paths=(bases/*/from-image.env bases/*/packages)
 
-          update_tag="${BASE_VERSION}-$(date -u +%Y%m%dT%H%M)"
-          if git ls-remote --exit-code --tags origin "refs/tags/${update_tag}" >/dev/null; then
-            echo "Tag ${update_tag} already exists." >&2
-            exit 1
-          fi
-          echo "UPDATE_TAG=${update_tag}" >>"${GITHUB_OUTPUT}"
-
           if [[ -z "$(git status --porcelain -- "${lock_paths[@]}")" ]]; then
             echo "No base lock changes detected."
             echo "HAS_CHANGES=false" >>"${GITHUB_OUTPUT}"
             echo "HEAD_OID=$(git rev-parse HEAD)" >>"${GITHUB_OUTPUT}"
+            echo "RELEASE_TAG=${RELEASE_TAG}" >>"${GITHUB_OUTPUT}"
             exit 0
           fi
+
+          release_tag="${BASE_VERSION}-$(date -u +%Y%m%dT%H%M)"
+          if git ls-remote --exit-code --tags origin "refs/tags/${release_tag}" >/dev/null; then
+            echo "Tag ${release_tag} already exists." >&2
+            exit 1
+          fi
+          echo "RELEASE_TAG=${release_tag}" >>"${GITHUB_OUTPUT}"
           echo "HAS_CHANGES=true" >>"${GITHUB_OUTPUT}"
 
       - name: Commit base lock updates
@@ -243,39 +251,29 @@ jobs:
         env:
           COMMIT_OID: ${{ steps.commit-locks.outputs.commit }}
           GH_TOKEN: ${{ github.token }}
-          UPDATE_TAG: ${{ steps.prepare-commit.outputs.UPDATE_TAG }}
+          RELEASE_TAG: ${{ steps.prepare-commit.outputs.RELEASE_TAG }}
         run: |
           set -euo pipefail
           gh api \
             --method POST \
             "repos/${GITHUB_REPOSITORY}/git/refs" \
-            -f "ref=refs/tags/${UPDATE_TAG}" \
+            -f "ref=refs/tags/${RELEASE_TAG}" \
             -f "sha=${COMMIT_OID}"
 
-      - name: Tag unchanged base locks
-        if: steps.prepare-commit.outputs.HAS_CHANGES == 'false'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          HEAD_OID: ${{ steps.prepare-commit.outputs.HEAD_OID }}
-          UPDATE_TAG: ${{ steps.prepare-commit.outputs.UPDATE_TAG }}
-        run: |
-          set -euo pipefail
-          gh api \
-            --method POST \
-            "repos/${GITHUB_REPOSITORY}/git/refs" \
-            -f "ref=refs/tags/${UPDATE_TAG}" \
-            -f "sha=${HEAD_OID}"
-
-      - name: Resolve refresh SHA
-        id: resolve-refresh-sha
+      - name: Resolve release ref
+        id: resolve-release-ref
         env:
           COMMIT_OID: ${{ steps.commit-locks.outputs.commit }}
           HAS_CHANGES: ${{ steps.prepare-commit.outputs.HAS_CHANGES }}
           HEAD_OID: ${{ steps.prepare-commit.outputs.HEAD_OID }}
+          RELEASE_TAG: ${{ steps.prepare-commit.outputs.RELEASE_TAG }}
+          RELEASE_SHA: ${{ env.RELEASE_SHA }}
         run: |
           set -euo pipefail
           if [[ "${HAS_CHANGES}" == "true" ]]; then
-            echo "REFRESH_SHA=${COMMIT_OID}" >>"${GITHUB_OUTPUT}"
+            release_sha="${COMMIT_OID}"
           else
-            echo "REFRESH_SHA=${HEAD_OID}" >>"${GITHUB_OUTPUT}"
+            release_sha="${RELEASE_SHA:-${HEAD_OID}}"
           fi
+          echo "RELEASE_TAG=${RELEASE_TAG}" >>"${GITHUB_OUTPUT}"
+          echo "RELEASE_SHA=${release_sha}" >>"${GITHUB_OUTPUT}"

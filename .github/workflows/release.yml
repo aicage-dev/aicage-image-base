@@ -4,7 +4,8 @@ run-name: Release (${{ github.ref_name }})
 "on":
   push:
     tags:
-      - "*"
+      - "*.*.*"
+  workflow_dispatch: {}
 
 permissions:
   contents: read
@@ -17,7 +18,6 @@ jobs:
       contents: write
     outputs:
       BASE_VERSION: ${{ steps.release-line.outputs.BASE_VERSION }}
-      IS_REFRESH_TAG: ${{ steps.release-line.outputs.IS_REFRESH_TAG }}
       RELEASE_BRANCH: ${{ steps.release-line.outputs.RELEASE_BRANCH }}
     steps:
       - name: Checkout
@@ -31,50 +31,23 @@ jobs:
         run: |
           set -euo pipefail
           base_version="${GITHUB_REF_NAME}"
-          is_refresh_tag="false"
-          if [[ "${GITHUB_REF_NAME}" =~ ^(.+)-[0-9]{8}T[0-9]{4}$ ]]; then
-            base_version="${BASH_REMATCH[1]}"
-            is_refresh_tag="true"
+          if [[ ! "${GITHUB_REF_NAME}" =~ ^v?[0-9]+[.][0-9]+[.][0-9]+$ ]]; then
+            base_version="${GITHUB_REF_NAME%-*}"
           fi
 
           {
             echo "BASE_VERSION=${base_version}"
-            echo "IS_REFRESH_TAG=${is_refresh_tag}"
             echo "RELEASE_BRANCH=release/${base_version}"
           } >>"${GITHUB_OUTPUT}"
 
-      - name: Verify tagged commit is on the expected branch
-        env:
-          IS_REFRESH_TAG: ${{ steps.release-line.outputs.IS_REFRESH_TAG }}
-          RELEASE_BRANCH: ${{ steps.release-line.outputs.RELEASE_BRANCH }}
-        run: |
-          set -euo pipefail
-          git fetch origin '+refs/heads/*:refs/remotes/origin/*'
-
-          expected_branch="origin/main"
-          if [[ "${IS_REFRESH_TAG}" == "true" ]]; then
-            expected_branch="origin/${RELEASE_BRANCH}"
-          fi
-
-          if ! git merge-base --is-ancestor "${GITHUB_SHA}" "${expected_branch}"; then
-            echo "Tag ${GITHUB_REF_NAME} points to ${GITHUB_SHA}," >&2
-            echo "but that commit is not on ${expected_branch}." >&2
-            exit 1
-          fi
-
       - name: Create release branch
-        if: steps.release-line.outputs.IS_REFRESH_TAG == 'false'
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_BRANCH: ${{ steps.release-line.outputs.RELEASE_BRANCH }}
         run: |
           set -euo pipefail
           if git ls-remote --exit-code --heads origin "${RELEASE_BRANCH}" >/dev/null; then
-            remote_sha="$(git ls-remote --heads origin "${RELEASE_BRANCH}" | awk '{print $1}')"
-            if [[ "${remote_sha}" != "${GITHUB_SHA}" ]]; then
-              echo "${RELEASE_BRANCH} already exists at ${remote_sha}, expected ${GITHUB_SHA}" >&2
-              exit 1
-            fi
+            echo "Branch ${RELEASE_BRANCH} already exists." >&2
             exit 0
           fi
 
@@ -82,26 +55,33 @@ jobs:
             "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
             "${GITHUB_SHA}:refs/heads/${RELEASE_BRANCH}"
 
+      - name: Verify tagged commit is on the release branch
+        env:
+          RELEASE_BRANCH: ${{ steps.release-line.outputs.RELEASE_BRANCH }}
+        run: |
+          set -euo pipefail
+          git fetch origin "refs/heads/${RELEASE_BRANCH}:refs/remotes/origin/${RELEASE_BRANCH}"
+
+          if ! git merge-base --is-ancestor "${GITHUB_SHA}" "origin/${RELEASE_BRANCH}"; then
+            echo "Tag ${GITHUB_REF_NAME} points to ${GITHUB_SHA}," >&2
+            echo "but that commit is not on origin/${RELEASE_BRANCH}." >&2
+            exit 1
+          fi
+
   refresh-base-locks:
     needs: verify-tagged-commit
-    if: needs.verify-tagged-commit.outputs.IS_REFRESH_TAG == 'false'
     permissions:
-      actions: write
+      actions: read
       contents: write
     uses: ./.github/workflows/update-package-versions-worker.yml
     with:
       base_version: ${{ needs.verify-tagged-commit.outputs.BASE_VERSION }}
+      release_tag: ${{ github.ref_name }}
+      release_sha: ${{ github.sha }}
       release_branch: ${{ needs.verify-tagged-commit.outputs.RELEASE_BRANCH }}
 
   build-images:
-    needs: [refresh-base-locks, verify-tagged-commit]
-    if: >-
-      always() &&
-      needs.verify-tagged-commit.result == 'success' &&
-      (
-        needs.verify-tagged-commit.outputs.IS_REFRESH_TAG == 'true' ||
-        needs.refresh-base-locks.result == 'success'
-      )
+    needs: refresh-base-locks
     permissions:
       contents: read
       actions: read
@@ -109,20 +89,11 @@ jobs:
       id-token: write
     uses: ./.github/workflows/build-all-images-worker.yml
     with:
-      git_ref: >-
-        ${{
-          needs.verify-tagged-commit.outputs.IS_REFRESH_TAG == 'true' &&
-          github.ref_name ||
-          needs.refresh-base-locks.outputs.refresh_tag
-        }}
+      git_ref: ${{ needs.refresh-base-locks.outputs.release_tag }}
 
   release:
     runs-on: ubuntu-latest
-    needs: [build-images, refresh-base-locks, verify-tagged-commit]
-    if: >-
-      always() &&
-      needs.verify-tagged-commit.result == 'success' &&
-      needs.build-images.result == 'success'
+    needs: [build-images, refresh-base-locks]
     permissions:
       contents: write
       id-token: write
@@ -185,18 +156,8 @@ jobs:
       - name: "Release: Create GitHub release"
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: >-
-            ${{
-              needs.verify-tagged-commit.outputs.IS_REFRESH_TAG == 'true' &&
-              github.ref_name ||
-              needs.refresh-base-locks.outputs.refresh_tag
-            }}
-          TARGET_SHA: >-
-            ${{
-              needs.verify-tagged-commit.outputs.IS_REFRESH_TAG == 'true' &&
-              github.sha ||
-              needs.refresh-base-locks.outputs.refresh_sha
-            }}
+          RELEASE_TAG: ${{ needs.refresh-base-locks.outputs.release_tag }}
+          TARGET_SHA: ${{ needs.refresh-base-locks.outputs.release_sha }}
         run: |
           set -euo pipefail
           gh release create "${RELEASE_TAG}" \

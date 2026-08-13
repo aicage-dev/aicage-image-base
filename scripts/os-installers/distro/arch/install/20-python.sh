@@ -1,12 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-pacman -S --noconfirm --needed \
-  python \
-  python-pip \
-  python-pipx \
-  python-virtualenv
-
 : "${PIPX_HOME:?PIPX_HOME is required}"
 : "${PIPX_BIN_DIR:?PIPX_BIN_DIR is required}"
 

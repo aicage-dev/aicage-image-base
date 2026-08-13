@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if command -v gradle >/dev/null 2>&1; then
-  exit 0
-fi
-
 # add retry and other params to reduce failure in pipelines
 curl_wrapper() {
   curl -fsSL \
@@ -37,6 +33,10 @@ if [[ -z "${download_url}" || "${download_url}" == "null" ]]; then
   exit 1
 fi
 
+if command -v gradle >/dev/null 2>&1 && gradle --version | grep -Fxq "Gradle ${gradle_version}"; then
+  exit 0
+fi
+
 tmp_dir="$(mktemp -d)"
 trap 'rm -rf "${tmp_dir}"' EXIT
 
@@ -60,10 +60,11 @@ if [[ -n "${checksum_url}" && "${checksum_url}" != "null" ]]; then
 fi
 
 install_root="/opt/gradle"
+gradle_home="${install_root}/gradle-${gradle_version}"
 mkdir -p "${install_root}"
+rm -rf "${gradle_home}"
 unzip -q "${archive_path}" -d "${install_root}"
 
-gradle_home="${install_root}/gradle-${gradle_version}"
 ln -sfn "${gradle_home}" "${install_root}/latest"
 ln -sf "${install_root}/latest/bin/gradle" /usr/local/bin/gradle
 

@@ -181,6 +181,7 @@ jobs:
       - resolve
     permissions:
       contents: write
+      pull-requests: write
     runs-on: ubuntu-latest
     env:
       BASE_VERSION: ${{ inputs.base_version }}
@@ -259,6 +260,36 @@ jobs:
             "repos/${GITHUB_REPOSITORY}/git/refs" \
             -f "ref=refs/tags/${RELEASE_TAG}" \
             -f "sha=${COMMIT_OID}"
+
+      - name: Ensure base lock PR
+        if: steps.prepare-commit.outputs.HAS_CHANGES == 'true'
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_BRANCH: ${{ env.RELEASE_BRANCH }}
+        run: |
+          set -euo pipefail
+          lock_paths=(bases/*/from-image.env bases/*/packages)
+
+          if gh pr list \
+            --base "${DEFAULT_BRANCH}" \
+            --head "${RELEASE_BRANCH}" \
+            --state open \
+            --json number \
+            --jq 'length > 0' | grep -qx true; then
+            exit 0
+          fi
+
+          if git diff --quiet "origin/${DEFAULT_BRANCH}...HEAD" -- "${lock_paths[@]}"; then
+            echo "No base lock diff to ${DEFAULT_BRANCH}."
+            exit 0
+          fi
+
+          gh pr create \
+            --base "${DEFAULT_BRANCH}" \
+            --head "${RELEASE_BRANCH}" \
+            --title "Update base locks from ${RELEASE_BRANCH}" \
+            --body "Updates base lock files from ${RELEASE_BRANCH}."
 
       - name: Resolve release ref
         id: resolve-release-ref

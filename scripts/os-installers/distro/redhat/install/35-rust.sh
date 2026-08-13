@@ -23,6 +23,12 @@ esac
 
 RUSTUP_TARGET="${RUSTUP_ARCH}-${rustup_os}"
 
+rust_version="${AICAGE_PACKAGE_RUST_INSTALL:-}"
+rust_version="${rust_version#*=}"
+
+rustup_version="${AICAGE_PACKAGE_RUSTUP_INSTALL:-}"
+rustup_version="${rustup_version#*=}"
+
 # add retry and other params to reduce failure in pipelines
 curl_wrapper() {
   curl -fsSL \
@@ -33,17 +39,23 @@ curl_wrapper() {
     "$@"
 }
 
+install_rustup=0
 if ! command -v rustup >/dev/null 2>&1; then
+  install_rustup=1
+elif [[ -n "${rustup_version}" ]] && ! rustup --version | grep -Fq "rustup ${rustup_version} "; then
+  install_rustup=1
+fi
+
+if [[ "${install_rustup}" -eq 1 ]]; then
   rustup_args=(-y --profile minimal --no-modify-path)
-  if [[ -n "${AICAGE_PACKAGE_RUST_INSTALL:-}" ]]; then
-    rustup_args+=(--default-toolchain "${AICAGE_PACKAGE_RUST_INSTALL#*=}")
+  if [[ -n "${rust_version}" ]]; then
+    rustup_args+=(--default-toolchain "${rust_version}")
   fi
 
-  if [[ -n "${AICAGE_PACKAGE_RUSTUP_INSTALL:-}" ]]; then
+  if [[ -n "${rustup_version}" ]]; then
     tmp_dir="$(mktemp -d)"
     trap 'rm -rf "${tmp_dir}"' EXIT
     rustup_init="${tmp_dir}/rustup-init"
-    rustup_version="${AICAGE_PACKAGE_RUSTUP_INSTALL#*=}"
     rustup_url="https://static.rust-lang.org/rustup/archive/${rustup_version}/${RUSTUP_TARGET}/rustup-init"
     curl_wrapper "${rustup_url}" -o "${rustup_init}"
     chmod +x "${rustup_init}"
@@ -51,6 +63,13 @@ if ! command -v rustup >/dev/null 2>&1; then
   else
     curl_wrapper https://sh.rustup.rs | sh -s -- "${rustup_args[@]}"
   fi
+fi
+
+if [[ -n "${rust_version}" ]]; then
+  if ! command -v rustc >/dev/null 2>&1 || ! rustc --version | grep -Fq "rustc ${rust_version} "; then
+    rustup toolchain install "${rust_version}" --profile minimal
+  fi
+  rustup default "${rust_version}"
 fi
 
 rustup component add rustfmt clippy

@@ -42,6 +42,24 @@ is_tool_spec() {
   esac
 }
 
+is_package_manager_spec() {
+  local spec="$1"
+  local name="${spec%%=*}"
+
+  case "${name}" in
+    corepack | gradle | jdk | node | pip | rust | rustup | setuptools | uv | wheel)
+      return 1
+      ;;
+    pipx)
+      command -v apk >/dev/null 2>&1 && return 1
+      return 0
+      ;;
+    *)
+      return 0
+      ;;
+  esac
+}
+
 spec_version() {
   local spec="$1"
 
@@ -59,6 +77,15 @@ tool_version() {
   printf '%s\n' "${version}"
 }
 
+upstream_tool_version() {
+  local spec="$1"
+  local version
+
+  version="$(tool_version "${spec}")"
+  version="${version%%-*}"
+  printf '%s\n' "${version}"
+}
+
 expect_contains() {
   local actual="$1"
   local expected="$2"
@@ -70,11 +97,19 @@ expect_contains() {
   fi
 }
 
+python_package_version() {
+  local package="$1"
+
+  python3 -m pip show "${package}" 2>/dev/null |
+    awk -F': ' '$1 == "Version" {print $2}'
+}
+
 check_deb_specs() {
   local spec package expected actual
 
   while IFS= read -r spec; do
     [[ "${spec}" == *=* ]] || continue
+    is_package_manager_spec "${spec}" || continue
     package="${spec%%=*}"
     expected="${spec#*=}"
     if ! actual="$(dpkg-query -W -f='${Version}' "${package}" 2>/dev/null)"; then
@@ -94,6 +129,7 @@ check_apk_specs() {
 
   while IFS= read -r spec; do
     [[ "${spec}" == *=* ]] || continue
+    is_package_manager_spec "${spec}" || continue
     package="${spec%%=*}"
     expected="${spec#*=}"
     if ! actual="$(apk info --installed -v "${package}" 2>/dev/null)"; then
@@ -113,6 +149,7 @@ check_rpm_specs() {
 
   while IFS= read -r spec; do
     [[ "${spec}" == *=* ]] || continue
+    is_package_manager_spec "${spec}" || continue
     package="${spec%%=*}"
     expected="${spec#*=}"
     if ! epoch="$(rpm -q --qf '%{EPOCH}' "${package}" 2>/dev/null)"; then
@@ -133,15 +170,16 @@ check_rpm_specs() {
 }
 
 check_tool_versions() {
-  local corepack_version gosu_version gradle_version node_version rust_version rustup_version tini_version uv_version
+  local corepack_version gosu_version gradle_version node_version pip_version pipx_version rust_version rustup_version
+  local setuptools_version tini_version uv_version wheel_version
 
   if [[ -n "${AICAGE_PACKAGE_GOSU_INSTALL:-}" ]]; then
-    gosu_version="$(tool_version "${AICAGE_PACKAGE_GOSU_INSTALL}")"
+    gosu_version="$(upstream_tool_version "${AICAGE_PACKAGE_GOSU_INSTALL}")"
     expect_contains "$(gosu --version)" "${gosu_version}" gosu
   fi
 
   if [[ -n "${AICAGE_PACKAGE_TINI_INSTALL:-}" ]]; then
-    tini_version="$(tool_version "${AICAGE_PACKAGE_TINI_INSTALL}")"
+    tini_version="$(upstream_tool_version "${AICAGE_PACKAGE_TINI_INSTALL}")"
     tini_version="${tini_version#v}"
     expect_contains "$(tini --version)" "${tini_version}" tini
   fi
@@ -161,6 +199,26 @@ check_tool_versions() {
     [[ "$(node --version)" == "v${node_version}" ]]
   fi
 
+  if [[ -n "${AICAGE_PACKAGE_PIP_INSTALL:-}" ]]; then
+    pip_version="$(tool_version "${AICAGE_PACKAGE_PIP_INSTALL}")"
+    expect_contains "$(python3 -m pip --version)" "pip ${pip_version} " pip
+  fi
+
+  if [[ -n "${AICAGE_PACKAGE_SETUPTOOLS_INSTALL:-}" ]]; then
+    setuptools_version="$(tool_version "${AICAGE_PACKAGE_SETUPTOOLS_INSTALL}")"
+    [[ "$(python_package_version setuptools)" == "${setuptools_version}" ]]
+  fi
+
+  if [[ -n "${AICAGE_PACKAGE_WHEEL_INSTALL:-}" ]]; then
+    wheel_version="$(tool_version "${AICAGE_PACKAGE_WHEEL_INSTALL}")"
+    [[ "$(python_package_version wheel)" == "${wheel_version}" ]]
+  fi
+
+  if [[ -n "${AICAGE_PACKAGE_PIPX_INSTALL:-}" ]] && command -v apk >/dev/null 2>&1; then
+    pipx_version="$(tool_version "${AICAGE_PACKAGE_PIPX_INSTALL}")"
+    [[ "$(pipx --version)" == "${pipx_version}" ]]
+  fi
+
   if [[ -n "${AICAGE_PACKAGE_RUST_INSTALL:-}" ]]; then
     rust_version="$(tool_version "${AICAGE_PACKAGE_RUST_INSTALL}")"
     expect_contains "$(rustc --version)" "rustc ${rust_version} " rust
@@ -168,7 +226,7 @@ check_tool_versions() {
 
   if [[ -n "${AICAGE_PACKAGE_RUSTUP_INSTALL:-}" ]]; then
     rustup_version="$(tool_version "${AICAGE_PACKAGE_RUSTUP_INSTALL}")"
-    expect_contains "$(rustup --version)" "rustup ${rustup_version} " rustup
+    expect_contains "$(rustup --version 2>/dev/null)" "rustup ${rustup_version} " rustup
   fi
 
   if [[ -n "${AICAGE_PACKAGE_UV_INSTALL:-}" ]]; then

@@ -1,2 +1,4 @@
+pre_install: distro/alpine/pre-install.sh
 os_installer: distro/alpine/install.sh
+post_install: distro/alpine/post-install.sh
 test_suite: default

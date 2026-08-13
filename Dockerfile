@@ -6,6 +6,8 @@ FROM ${FROM_IMAGE} AS from_image
 
 ARG IMAGE_SOURCE_URL
 ARG OS_INSTALLER
+ARG PRE_INSTALL
+ARG POST_INSTALL
 ARG PACKAGE_ENV_FILE
 
 LABEL org.opencontainers.image.title="aicage-image-base" \
@@ -29,7 +31,9 @@ RUN --mount=type=bind,source=scripts/os-installers,target=/tmp/aicage/scripts/os
       . /tmp/aicage/package.env; \
       set +a; \
     fi && \
+    /tmp/aicage/scripts/os-installers/${PRE_INSTALL} && \
     /tmp/aicage/scripts/os-installers/${OS_INSTALLER} && \
+    /tmp/aicage/scripts/os-installers/${POST_INSTALL} && \
     cp /tmp/aicage/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 ENV AICAGE_ENTRYPOINT_CMD=bash

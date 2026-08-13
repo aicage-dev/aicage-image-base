@@ -60,6 +60,7 @@ jobs:
     permissions:
       actions: read
       contents: write
+      pull-requests: write
     uses: ./.github/workflows/update-package-versions-worker.yml
     with:
       base_version: ${{ needs.latest-release-branch.outputs.BASE_VERSION }}

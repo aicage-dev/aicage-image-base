@@ -137,7 +137,9 @@ jobs:
             echo "IMAGE_TEST_TAG=${IMAGE_TEST_TAG}"
             echo "IMAGE_SOURCE_URL=${IMAGE_SOURCE_URL}"
             echo "FROM_IMAGE=$(get_base_from_image "${BASE_ALIAS}")"
+            echo "PRE_INSTALL=$(get_base_build_field "${BASE_ALIAS}" pre_install)"
             echo "OS_INSTALLER=$(get_base_build_field "${BASE_ALIAS}" os_installer)"
+            echo "POST_INSTALL=$(get_base_build_field "${BASE_ALIAS}" post_install)"
           } >> "$GITHUB_OUTPUT"
           {
             echo "IMAGE_NAME=${IMAGE_NAME}"
@@ -146,7 +148,9 @@ jobs:
             echo "IMAGE_TEST_TAG=${IMAGE_TEST_TAG}"
             echo "IMAGE_SOURCE_URL=${IMAGE_SOURCE_URL}"
             echo "FROM_IMAGE=$(get_base_from_image "${BASE_ALIAS}")"
+            echo "PRE_INSTALL=$(get_base_build_field "${BASE_ALIAS}" pre_install)"
             echo "OS_INSTALLER=$(get_base_build_field "${BASE_ALIAS}" os_installer)"
+            echo "POST_INSTALL=$(get_base_build_field "${BASE_ALIAS}" post_install)"
           } >> "$GITHUB_ENV"
 
       - name: Build test image tag
@@ -159,7 +163,9 @@ jobs:
           build-args: |
             FROM_IMAGE=${{ env.FROM_IMAGE }}
             IMAGE_SOURCE_URL=${{ env.IMAGE_SOURCE_URL }}
+            PRE_INSTALL=${{ env.PRE_INSTALL }}
             OS_INSTALLER=${{ env.OS_INSTALLER }}
+            POST_INSTALL=${{ env.POST_INSTALL }}
             PACKAGE_ENV_FILE=bases/${{ env.BASE_ALIAS }}/packages/${{ env.ARCH_SUFFIX }}.env
           tags: |
             ${{ env.IMAGE_TEST_TAG }}

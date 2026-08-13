@@ -20,7 +20,7 @@ if [[ -n "${AICAGE_PACKAGE_WHEEL_INSTALL:-}" ]]; then
   pip_packages[2]="${AICAGE_PACKAGE_WHEEL_INSTALL/=/==}"
 fi
 
-python3 -m pip install "${PIP_ARGS[@]}" --ignore-installed --upgrade "${pip_packages[@]}"
+python3 -m pip install "${PIP_ARGS[@]}" --upgrade "${pip_packages[@]}"
 
 # Alpine does not ship a pipx package; install via pip when missing.
 if ! command -v pipx >/dev/null 2>&1; then

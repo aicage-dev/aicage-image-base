@@ -84,7 +84,7 @@ Smoke suites live in `tests/bases/smoke/` (including subfolders); run individual
 
 ## Adding a base
 
-1. Create `bases/<alias>/base.yml` with `from_image` and `os_installer`.
+1. Create `bases/<alias>/base.yml` and `base-build.yml` with the upstream image and installers.
 2. Create `bases/<alias>/packages/packages.yml` with the base package list.
 3. Run `scripts/from-images/resolve.sh <alias>` to pin the upstream image digest.
 4. Add or adjust installer scripts if the base needs extra setup.

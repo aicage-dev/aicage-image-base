@@ -1,2 +1,4 @@
+pre_install: distro/arch/pre-install.sh
 os_installer: distro/arch/install.sh
+post_install: distro/arch/post-install.sh
 test_suite: default

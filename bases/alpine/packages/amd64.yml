@@ -193,4 +193,4 @@ packages:
   rustup:
     - rustup=1.29.0
   uv:
-    - uv=0.12.3
+    - uv=0.12.4

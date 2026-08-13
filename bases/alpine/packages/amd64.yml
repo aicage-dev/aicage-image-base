@@ -187,10 +187,10 @@ packages:
   wheel:
     - wheel=0.48.0
   pipx:
-    - pipx=1.16.6
+    - pipx=1.16.7
   rust:
     - rust=1.97.1
   rustup:
     - rustup=1.29.0
   uv:
-    - uv=0.12.3
+    - uv=0.12.4

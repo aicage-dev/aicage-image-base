@@ -1,2 +1,4 @@
+pre_install: distro/redhat/pre-install.sh
 os_installer: distro/redhat/install.sh
+post_install: distro/redhat/post-install.sh
 test_suite: default

@@ -54,7 +54,7 @@ packages:
   tree:
     - tree=2.2.1-4.fc44
   tzdata:
-    - tzdata=2026b-1.fc44
+    - tzdata=2026c-1.fc44
   unzip:
     - unzip=6.0-69.fc44
   xz:
@@ -124,7 +124,7 @@ packages:
   postgresql:
     - postgresql=18.4-1.fc44
   sqlite:
-    - sqlite=3.51.2-1.fc44
+    - sqlite=3.51.2-2.fc44
   pipx:
     - pipx=1.15.0-2.fc44
   python3:

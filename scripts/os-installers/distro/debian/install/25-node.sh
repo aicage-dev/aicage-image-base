@@ -59,7 +59,7 @@ if [[ -z "${NODEJS_VERSION}" ]]; then
   exit 1
 fi
 
-if ! command -v node >/dev/null 2>&1; then
+if ! command -v node >/dev/null 2>&1 || [[ "$(node --version)" != "v${NODEJS_VERSION}" ]]; then
   curl_wrapper "https://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-${NODE_DIST_ARCH}.tar.xz" |
     tar -xJ -C /usr/local --strip-components=1
 fi

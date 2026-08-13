@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-dnf -y install \
-  "$(dnf_spec "${AICAGE_PACKAGE_ANT_INSTALL:-ant}")" \
-  "$(dnf_spec "${AICAGE_PACKAGE_MAVEN_INSTALL:-maven}")" \
-  "$(dnf_spec "${AICAGE_PACKAGE_PROTOBUF_COMPILER_INSTALL:-protobuf-compiler}")"
-
 if command -v javac >/dev/null 2>&1; then
   exit 0
 fi

@@ -230,6 +230,36 @@ jobs:
             --image "${IMAGE_NAME}@${IMAGE_DIGEST}" \
             --base "${BASE_ALIAS}"
 
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6  # v4.1.2
+
+      - name: Generate SBOM
+        uses: anchore/sbom-action@f8bdd1d8ac5e901a77a92f111440fdb1b593736b  # v0.20.6
+        with:
+          image: ${{ env.IMAGE_NAME }}@${{ steps.build_image.outputs.digest }}
+          registry-username: ${{ github.actor }}
+          registry-password: ${{ secrets.GITHUB_TOKEN }}
+          format: spdx-json
+          output-file: sbom.spdx.json
+          upload-artifact: false
+          upload-release-assets: false
+
+      - name: Attest SBOM
+        env:
+          IMAGE_DIGEST: ${{ steps.build_image.outputs.digest }}
+        run: |
+          set -euo pipefail
+          signing_config="${RUNNER_TEMP}/cosign-signing-config.json"
+          cosign signing-config create \
+            --with-default-services \
+            --no-default-rekor \
+            --out "${signing_config}"
+          cosign attest --yes \
+            --predicate sbom.spdx.json \
+            --type spdxjson \
+            --signing-config "${signing_config}" \
+            "${IMAGE_NAME}@${IMAGE_DIGEST}"
+
       - name: Export digest (amd64)
         id: out-amd64
         if: matrix.arch == 'amd64'

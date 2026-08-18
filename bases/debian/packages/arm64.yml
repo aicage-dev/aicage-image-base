@@ -50,13 +50,13 @@ packages:
   tzdata:
     - tzdata=2026b-0+deb13u1
   unzip:
-    - unzip=6.0-29
+    - unzip=6.0-29+deb13u1
   xz-utils:
     - xz-utils=5.8.1-1+deb13u1
   yq:
     - yq=3.4.3-2
   zip:
-    - zip=3.0-15
+    - zip=3.0-15+deb13u1
   locales:
     - locales=2.41-12+deb13u3
   locales-all:
@@ -152,7 +152,7 @@ packages:
   docker-ce-cli:
     - docker-ce-cli=5:29.7.2-1~debian.13~trixie
   docker-compose-plugin:
-    - docker-compose-plugin=5.4.0-1~debian.13~trixie
+    - docker-compose-plugin=5.5.0-1~debian.13~trixie
   corepack:
     - corepack=0.35.0
   gradle:
@@ -172,4 +172,4 @@ packages:
   rustup:
     - rustup=1.29.0
   uv:
-    - uv=0.12.3
+    - uv=0.12.5

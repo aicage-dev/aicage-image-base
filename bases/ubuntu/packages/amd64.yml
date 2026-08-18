@@ -152,7 +152,7 @@ packages:
   docker-ce-cli:
     - docker-ce-cli=5:29.7.2-1~ubuntu.26.04~resolute
   docker-compose-plugin:
-    - docker-compose-plugin=5.4.0-1~ubuntu.26.04~resolute
+    - docker-compose-plugin=5.5.0-1~ubuntu.26.04~resolute
   corepack:
     - corepack=0.35.0
   gradle:
@@ -172,4 +172,4 @@ packages:
   rustup:
     - rustup=1.29.0
   uv:
-    - uv=0.12.4
+    - uv=0.12.5

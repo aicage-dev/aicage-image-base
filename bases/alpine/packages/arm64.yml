@@ -108,9 +108,9 @@ packages:
   py3-virtualenv:
     - py3-virtualenv=21.3.3-r0
   python3:
-    - python3=3.14.7-r0
+    - python3=3.14.7-r1
   python3-dev:
-    - python3-dev=3.14.7-r0
+    - python3-dev=3.14.7-r1
   perl:
     - perl=5.42.2-r0
   ruby:
@@ -157,11 +157,11 @@ packages:
     - libstdc++=15.2.0-r5
   postgresql-client:
     - libncursesw=6.6_p20260516-r0
-    - libpq=18.4-r0
+    - libpq=18.6-r0
     - lz4-libs=1.10.0-r1
     - ncurses-terminfo-base=6.6_p20260516-r0
     - postgresql-common=1.3-r0
-    - postgresql18-client=18.4-r0
+    - postgresql18-client=18.6-r0
     - readline=8.3.3-r1
     - zstd-libs=1.5.7-r2
   procps:
@@ -193,4 +193,4 @@ packages:
   rustup:
     - rustup=1.29.0
   uv:
-    - uv=0.12.4
+    - uv=0.12.5

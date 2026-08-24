@@ -21,9 +21,6 @@ pip install -r requirements-dev.txt
 ## Repo layout
 
 - `bases/<alias>/base.yml` — Defines the upstream image and installer for each base.
-- `bases/<alias>/packages/packages.yml` — Lists packages and tool resolvers for the base.
-- `bases/<alias>/from-image.env` — Resolved upstream image digest for the base.
-- `bases/<alias>/packages/<arch>.{yml,env}` — Resolved package versions for one architecture.
 - `Dockerfile` — Docker build entrypoint.
 - `scripts/` — Build/test helpers.
 - `tests/bases/smoke/` — Bats suites for base images.
@@ -84,17 +81,12 @@ Smoke suites live in `tests/bases/smoke/` (including subfolders); run individual
 
 ## Adding a base
 
-1. Create `bases/<alias>/base.yml` and `base-build.yml` with the upstream image and installers.
-2. Create `bases/<alias>/packages/packages.yml` with the base package list.
-3. Run `scripts/from-images/resolve.sh <alias>` to pin the upstream image digest.
-4. Add or adjust installer scripts if the base needs extra setup.
-5. Update smoke coverage under `tests/bases/smoke/` if the new base requires validation.
-6. Document the new base in `README.md` if it should be visible to users.
+1. Create `bases/<alias>/base.yml` with `from_image` and `os_installer`.
+2. Add or adjust installer scripts if the base needs extra setup.
+3. Update smoke coverage under `tests/bases/smoke/` if the new base requires validation.
+4. Document the new base in `README.md` if it should be visible to users.
 
 ## CI
 
 `aicage-image-base/.github/workflows/build-<alias>.yml` builds and publishes base images (multi-arch)
 on tags, producing `<alias>-<version>` and `<alias>` tags.
-
-Release tags create a matching `release/<version>` branch. Scheduled base-lock refreshes run on that
-release branch, commit refreshed locks, and create tags named `<version>-<YYYYMMDD>T<HHMM>`.

@@ -23,12 +23,7 @@
     "**/*.bin",
 
     "scripts/os-installers/distro/*/install/02-gosu.sh",
-    "scripts/os-installers/distro/*/install/15-java.sh",
-    "scripts/os-installers/distro/*/install/16-gradle.sh",
-    "scripts/os-installers/distro/*/install/17-database-clients.sh",
-    "scripts/os-installers/distro/*/install/20-python.sh",
-    "scripts/os-installers/distro/*/install/25-node.sh",
-    "scripts/os-installers/distro/*/install/35-rust.sh",
-    "scripts/packages/*/versions.sh"
+    "scripts/os-installers/generic/install_jdk.sh",
+    "scripts/os-installers/generic/install_node.sh"
   ]
 }

@@ -1,4 +1,2 @@
-pre_install: distro/debian/pre-install.sh
 os_installer: distro/debian/install.sh
-post_install: distro/debian/post-install.sh
 test_suite: default

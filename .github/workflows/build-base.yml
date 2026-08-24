@@ -136,10 +136,8 @@ jobs:
             echo "IMAGE_LATEST_TAG=${IMAGE_LATEST_TAG}"
             echo "IMAGE_TEST_TAG=${IMAGE_TEST_TAG}"
             echo "IMAGE_SOURCE_URL=${IMAGE_SOURCE_URL}"
-            echo "FROM_IMAGE=$(get_base_from_image "${BASE_ALIAS}")"
-            echo "PRE_INSTALL=$(get_base_build_field "${BASE_ALIAS}" pre_install)"
+            echo "FROM_IMAGE=$(get_base_field "${BASE_ALIAS}" from_image)"
             echo "OS_INSTALLER=$(get_base_build_field "${BASE_ALIAS}" os_installer)"
-            echo "POST_INSTALL=$(get_base_build_field "${BASE_ALIAS}" post_install)"
           } >> "$GITHUB_OUTPUT"
           {
             echo "IMAGE_NAME=${IMAGE_NAME}"
@@ -147,19 +145,9 @@ jobs:
             echo "IMAGE_LATEST_TAG=${IMAGE_LATEST_TAG}"
             echo "IMAGE_TEST_TAG=${IMAGE_TEST_TAG}"
             echo "IMAGE_SOURCE_URL=${IMAGE_SOURCE_URL}"
-            echo "FROM_IMAGE=$(get_base_from_image "${BASE_ALIAS}")"
-            echo "PRE_INSTALL=$(get_base_build_field "${BASE_ALIAS}" pre_install)"
+            echo "FROM_IMAGE=$(get_base_field "${BASE_ALIAS}" from_image)"
             echo "OS_INSTALLER=$(get_base_build_field "${BASE_ALIAS}" os_installer)"
-            echo "POST_INSTALL=$(get_base_build_field "${BASE_ALIAS}" post_install)"
           } >> "$GITHUB_ENV"
-
-      - name: Resolve package env label
-        id: package_env_label
-        run: |
-          set -euo pipefail
-          package_env_file="bases/${BASE_ALIAS}/packages/${ARCH_SUFFIX}.env"
-          [[ -f "${package_env_file}" ]]
-          echo "PACKAGE_ENV_BASE64=$(base64 <"${package_env_file}" | tr -d '\n')" >> "$GITHUB_OUTPUT"
 
       - name: Build test image tag
         id: build_image
@@ -168,13 +156,11 @@ jobs:
           context: .
           push: true
           provenance: mode=max
+          sbom: true
           build-args: |
             FROM_IMAGE=${{ env.FROM_IMAGE }}
             IMAGE_SOURCE_URL=${{ env.IMAGE_SOURCE_URL }}
-            PRE_INSTALL=${{ env.PRE_INSTALL }}
             OS_INSTALLER=${{ env.OS_INSTALLER }}
-            POST_INSTALL=${{ env.POST_INSTALL }}
-            PACKAGE_ENV_FILE=bases/${{ env.BASE_ALIAS }}/packages/${{ env.ARCH_SUFFIX }}.env
           tags: |
             ${{ env.IMAGE_TEST_TAG }}
           labels: |
@@ -182,7 +168,6 @@ jobs:
             org.opencontainers.image.revision=${{ steps.oci.outputs.revision }}
             org.opencontainers.image.created=${{ steps.oci.outputs.created }}
             org.opencontainers.image.version=${{ steps.oci.outputs.version }}
-            com.aicage.package-env.base64=${{ steps.package_env_label.outputs.PACKAGE_ENV_BASE64 }}
 
       - name: Prepare vars to remove test tag
         id: untag_vars
@@ -196,7 +181,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Remove test tag on image
-        uses: ghcr-manager/ghcr-untag-action@6691a653f421749a921a1ce0e63fec76bf2748a9  # v1.0.7
+        uses: ghcr-manager/ghcr-untag-action@952822b03f7c536658dd68fb17f802f52451276e  # v1.0.8
         with:
           token: ${{ github.token }}
           owner: ${{ steps.untag_vars.outputs.image_owner }}
@@ -216,7 +201,6 @@ jobs:
           EXPECTED_REVISION: ${{ steps.oci.outputs.revision }}
           EXPECTED_CREATED: ${{ steps.oci.outputs.created }}
           EXPECTED_VERSION: ${{ steps.oci.outputs.version }}
-          EXPECTED_PACKAGE_ENV_BASE64: ${{ steps.package_env_label.outputs.PACKAGE_ENV_BASE64 }}
           IMAGE_DIGEST: ${{ steps.build_image.outputs.digest }}
         run: |
           set -euo pipefail
@@ -230,7 +214,6 @@ jobs:
               and .[0].Config.Labels["org.opencontainers.image.revision"] == $expected_revision
               and .[0].Config.Labels["org.opencontainers.image.created"] == $expected_created
               and .[0].Config.Labels["org.opencontainers.image.version"] == $expected_version
-              and .[0].Config.Labels["com.aicage.package-env.base64"] == env.EXPECTED_PACKAGE_ENV_BASE64
             ' >/dev/null
 
       - name: "Test: Setup BATS testing framework"
@@ -246,13 +229,6 @@ jobs:
           scripts/test.sh \
             --image "${IMAGE_NAME}@${IMAGE_DIGEST}" \
             --base "${BASE_ALIAS}"
-
-      - name: Generate and attest SBOM
-        uses: gh-workflow/image-sbom@7e9e8467266e6e066fa8691717c8d76566c7d2c0  # v1.0.0
-        with:
-          image: ${{ env.IMAGE_NAME }}@${{ steps.build_image.outputs.digest }}
-          registry-username: ${{ github.actor }}
-          registry-password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Export digest (amd64)
         id: out-amd64
@@ -318,7 +294,7 @@ jobs:
 
       - name: Use multi-arch publish action
         id: publish
-        uses: gh-workflow/multiarch-image-publish@c5eac5dd8f7ed6b39fffc6e2c2242966b4917260  # 0.2.1
+        uses: gh-workflow/multiarch-image-publish@310d8b3eb42bc5d1dc6746e70e449b93f63a41af  # 0.2.2
         env:
           IMAGE_NAME: ${{ needs.build.outputs.IMAGE_NAME }}
         with:

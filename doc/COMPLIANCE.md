@@ -18,19 +18,19 @@ These are installed outside the base OS package managers and need license notice
 
 - Node.js. Install: tarball from nodejs.org. Source: (<https://nodejs.org/dist/>). License: MIT.
   Notices: stays in the extracted tree under `/usr/local` (no relocation). Script:
-  `scripts/os-installers/distro/*/install/25-node.sh`.
+  `scripts/os-installers/generic/install_node.sh`.
 - Rust (rustup). Install: `curl | sh`. Source: (<https://sh.rustup.rs>). License: Apache-2.0 OR MIT.
   Notices: copies `LICENSE-APACHE` + `LICENSE-MIT` to `/usr/share/licenses/rustup/`. Script:
-  `scripts/os-installers/distro/*/install/35-rust.sh`.
+  `scripts/os-installers/generic/install_rust.sh`.
 - Eclipse Temurin JDK. Install: tarball from Adoptium API. Source: (<https://api.adoptium.net>).
   License: GPL-2.0 with Classpath Exception (OpenJDK). Notices: stays in the extracted tree under
-  `/opt/java` (no relocation). Script: `scripts/os-installers/distro/*/install/15-java.sh`.
+  `/opt/java` (no relocation). Script: `scripts/os-installers/generic/install_jdk.sh`.
 - Gradle. Install: zip from services.gradle.org. Source: (<https://services.gradle.org>). License:
   Apache-2.0. Notices: stays in the extracted tree under `/opt/gradle` (no relocation). Script:
-  `scripts/os-installers/distro/*/install/16-gradle.sh`.
+  `scripts/os-installers/generic/install_gradle.sh`.
 - uv (pipx). Install: pipx install. Source: (<https://github.com/astral-sh/uv>). License:
   Apache-2.0 OR MIT. Notices: stays in the pipx venv tree (no relocation). Script:
-  `scripts/os-installers/distro/*/install/20-python.sh`.
+  `scripts/os-installers/generic/install_python.sh`.
 - gosu (Fedora only). Install: GitHub release binary. Source: (<https://github.com/tianon/gosu>).
   License: Apache-2.0. Notices: stays with the downloaded release (no relocation). Script:
   `scripts/os-installers/distro/redhat/install/02-gosu.sh`.

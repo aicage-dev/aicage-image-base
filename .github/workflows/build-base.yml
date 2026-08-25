@@ -110,7 +110,7 @@ jobs:
         with:
           driver: docker-container
 
-      - name: Log in to Docker Hub
+      - name: Log in to image registry
         uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f  # v4.6.0
         with:
           registry: ghcr.io

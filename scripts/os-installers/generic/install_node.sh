@@ -78,3 +78,6 @@ if ! command -v xdg-open >/dev/null 2>&1; then
     apk add --no-cache xdg-utils
   fi
 fi
+
+# cleanup
+npm cache clean --force

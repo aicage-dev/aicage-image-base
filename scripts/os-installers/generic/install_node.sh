@@ -1,35 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# *** Special installation for Alpine ***
-
-if command -v apk >/dev/null 2>&1; then
-  # Prefer distro packages on Alpine to avoid missing musl tarballs.
-  # xdg-utils: provides xdg-open; required by npm-installed CLI agents (e.g. droid) to open auth/docs URLs
-  apk add --no-cache \
-    nodejs-current \
-    npm \
-    xdg-utils
-
-  npm config set prefix /usr/local
-
-  npm install -g corepack
-  corepack enable
-
-  exit 0
-fi
-
-# *** Installation for all non-Alpine distros ***
-
-case "$(uname -m)" in
-  x86_64) NODE_DIST_ARCH="x64" ;;
-  aarch64 | arm64) NODE_DIST_ARCH="arm64" ;;
-  *)
-    echo "Unsupported host architecture: $(uname -m)" >&2
-    exit 1
-    ;;
-esac
-
 # add retry and other params to reduce failure in pipelines
 curl_wrapper() {
   curl -fsSL \
@@ -40,28 +11,51 @@ curl_wrapper() {
     "$@"
 }
 
-NODEJS_VERSION="${NODEJS_VERSION:-}"
-if [[ -z "${NODEJS_VERSION}" ]]; then
-  NODEJS_VERSION="$(
-    curl_wrapper https://nodejs.org/dist/index.json |
-      jq -r 'map(select(.lts != false)) | .[0].version'
-  )"
-  NODEJS_VERSION="${NODEJS_VERSION#v}"
-fi
+install_node_from_tarball() {
+  local node_dist_arch
+  local nodejs_version
 
-if [[ -z "${NODEJS_VERSION}" ]]; then
-  echo "Unable to resolve latest Node.js LTS version" >&2
-  exit 1
-fi
+  case "$(uname -m)" in
+    x86_64) node_dist_arch="x64" ;;
+    aarch64 | arm64) node_dist_arch="arm64" ;;
+    *)
+      echo "Unsupported host architecture: $(uname -m)" >&2
+      exit 1
+      ;;
+  esac
 
-if ! command -v node >/dev/null 2>&1; then
-  curl_wrapper "https://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-${NODE_DIST_ARCH}.tar.xz" |
-    tar -xJ -C /usr/local --strip-components=1
-fi
+  nodejs_version="${NODEJS_VERSION:-}"
+  if [[ -z "${nodejs_version}" ]]; then
+    nodejs_version="$(
+      curl_wrapper https://nodejs.org/dist/index.json |
+        jq -r 'map(select(.lts != false)) | .[0].version'
+    )"
+    nodejs_version="${nodejs_version#v}"
+  fi
 
-ln -sf /usr/local/bin/node /usr/bin/node
-ln -sf /usr/local/bin/npm /usr/bin/npm
-ln -sf /usr/local/bin/npx /usr/bin/npx
+  if [[ -z "${nodejs_version}" ]]; then
+    echo "Unable to resolve latest Node.js LTS version" >&2
+    exit 1
+  fi
+
+  if ! command -v node >/dev/null 2>&1; then
+    curl_wrapper "https://nodejs.org/dist/v${nodejs_version}/node-v${nodejs_version}-linux-${node_dist_arch}.tar.xz" |
+      tar -xJ -C /usr/local --strip-components=1
+  fi
+
+  ln -sf /usr/local/bin/node /usr/bin/node
+  ln -sf /usr/local/bin/npm /usr/bin/npm
+  ln -sf /usr/local/bin/npx /usr/bin/npx
+}
+
+if command -v apk >/dev/null 2>&1; then
+  # Prefer distro packages on Alpine to avoid missing musl tarballs.
+  apk add --no-cache \
+    nodejs-current \
+    npm
+else
+  install_node_from_tarball
+fi
 
 npm config set prefix /usr/local
 

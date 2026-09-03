@@ -51,6 +51,22 @@ EOF
       g++ -o /tmp/hello-cpp /tmp/hello.cpp
       /tmp/hello-cpp | grep -qx ok-cpp
 
+      cat >/tmp/hello-gmp.c <<'"'"'EOF'"'"'
+#include <gmp.h>
+#include <stdio.h>
+
+int main(void) {
+  mpz_t value;
+  mpz_init_set_ui(value, 42);
+  gmp_printf("ok-gmp-%Zd\n", value);
+  mpz_clear(value);
+  return 0;
+}
+EOF
+
+      gcc -o /tmp/hello-gmp /tmp/hello-gmp.c -lgmp
+      /tmp/hello-gmp | grep -qx ok-gmp-42
+
       mkdir -p /tmp/cmake-smoke
       cat >/tmp/cmake-smoke/CMakeLists.txt <<'"'"'EOF'"'"'
 cmake_minimum_required(VERSION 3.20)

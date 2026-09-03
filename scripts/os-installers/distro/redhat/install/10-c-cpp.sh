@@ -6,6 +6,7 @@ dnf -y install \
   clang \
   cmake \
   gdb \
+  gmp-devel \
   lld \
   lldb \
   ltrace \

@@ -1,0 +1,32 @@
+name: Test bats action runner.home
+run-name: Test bats action runner.home (${{ github.ref_name }})
+
+"on":
+  workflow_call: {}
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  test-bats-action:
+    name: Test bats action ${{ github.ref_name }}
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: "Test: Setup BATS testing framework"
+        uses: bats-core/bats-action@77d6fb60505b4d0d1d73e48bd035b55074bbfb43  # 4.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          support-path: ${{ runner.home }}/.local/share/bats/bats-support
+          assert-path: ${{ runner.home }}/.local/share/bats/bats-assert
+          detik-path: ${{ runner.home }}/.local/share/bats/bats-detik
+          file-path: ${{ runner.home }}/.local/share/bats/bats-file

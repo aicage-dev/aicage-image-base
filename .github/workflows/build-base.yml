@@ -230,7 +230,7 @@ jobs:
             --base "${BASE_ALIAS}"
 
       - name: Generate and attest SBOM
-        uses: gh-workflow/image-sbom@0eb75eb57ce1d0aac3072bfff19207ac42539261  # v1.0.1
+        uses: gh-workflow/image-sbom@6c0fffba4127bf166b8d0746332a83bd9826dd81  # v1.0.4
         with:
           image: ${{ env.IMAGE_NAME }}@${{ steps.build_image.outputs.digest }}
           registry-username: ${{ github.actor }}

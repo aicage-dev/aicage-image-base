@@ -16,6 +16,7 @@ elif command -v apk >/dev/null 2>&1; then
     mariadb-client \
     postgresql-client \
     sqlite
+  rm -f /var/cache/apk/*
 elif command -v pacman >/dev/null 2>&1; then
   pacman -S --noconfirm --needed \
     mariadb-clients \

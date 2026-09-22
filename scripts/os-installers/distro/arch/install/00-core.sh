@@ -23,12 +23,14 @@ pacman -S --noconfirm --needed \
   procps-ng \
   ripgrep \
   rsync \
+  shellcheck \
   shadow \
   tar \
   time \
   tree \
   tzdata \
   unzip \
+  vim \
   xz \
   yq \
   zip

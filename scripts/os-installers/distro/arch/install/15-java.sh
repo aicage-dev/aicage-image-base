@@ -3,6 +3,7 @@ set -euo pipefail
 
 pacman -S --noconfirm --needed \
   ant \
+  jdk25-openjdk \
   maven \
   protobuf
 

@@ -24,6 +24,7 @@ dnf -y install \
   procps-ng \
   ripgrep \
   rsync \
+  ShellCheck \
   shadow-utils \
   tar \
   time \
@@ -31,6 +32,7 @@ dnf -y install \
   tree \
   tzdata \
   unzip \
+  vim-enhanced \
   xz \
   yq \
   zip

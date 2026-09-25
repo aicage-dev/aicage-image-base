@@ -22,12 +22,14 @@ apt-get install -y --no-install-recommends \
   patch \
   ripgrep \
   rsync \
+  shellcheck \
   tar \
   time \
   tini \
   tree \
   tzdata \
   unzip \
+  vim \
   xz-utils \
   yq \
   zip

@@ -23,6 +23,7 @@ apk add --no-cache \
   procps \
   ripgrep \
   rsync \
+  shellcheck \
   shadow \
   tar \
   time \
@@ -30,6 +31,7 @@ apk add --no-cache \
   tree \
   tzdata \
   unzip \
+  vim \
   xz \
   yq \
   zip

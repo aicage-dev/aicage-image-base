@@ -25,7 +25,7 @@
       command -v file
       command -v git
       command -v gpg
-      command -v magick
+      command -v magick || command -v convert # ImageMagick 6 on Ubuntu 24 is a wrapper and uses "convert"
       command -v jq
       command -v less
       command -v nano

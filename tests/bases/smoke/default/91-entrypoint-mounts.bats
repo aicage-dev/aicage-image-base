@@ -251,6 +251,33 @@ cleanup_mount_dir() {
   [[ "$output" == *"Refusing to start: home path or parent is a mountpoint:"* ]]
 }
 
+@test "allows an opted-in active home mount" {
+  host_dir="$(mktemp -d)"
+  trap 'cleanup_mount_dir "${host_dir}"' RETURN
+  chmod 755 "${host_dir}"
+  printf 'mounted\n' >"${host_dir}/.aicage-test-home-marker"
+  chmod 644 "${host_dir}/.aicage-test-home-marker"
+
+  run docker run --rm \
+    --env AICAGE_WORKSPACE=/workspace \
+    --env AICAGE_ALLOW_HOME_MOUNT=true \
+    -v "${host_dir}:/home/demo" \
+    --env AICAGE_HOST_IS_LINUX=true \
+    --env AICAGE_UID=1234 \
+    --env AICAGE_GID=2345 \
+    --env AICAGE_HOST_USER=demo \
+    --env AICAGE_HOME=/home/demo \
+    "${AICAGE_IMAGE_BASE_IMAGE}" \
+    -c '
+      set -euo pipefail
+      test "${HOME}" = /home/demo
+      test "$(id -u)" = 1234
+      cat "${HOME}/.aicage-test-home-marker"
+    '
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"mounted"* ]]
+}
+
 @test "refuses to start when /root is a mountpoint" {
   host_dir="$(mktemp -d)"
   trap 'cleanup_mount_dir "${host_dir}"' RETURN

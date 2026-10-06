@@ -9,6 +9,7 @@ set -euo pipefail
 # - AICAGE_HOST_USER: target runtime username
 # - AICAGE_HOME: target runtime home
 # - AICAGE_MOUNT_HOME: home mount anchor when it differs from active HOME
+# - AICAGE_ALLOW_HOME_MOUNT: allow AICAGE_HOME itself to be a mountpoint
 
 AICAGE_WORKSPACE="${AICAGE_WORKSPACE:-/workspace}"
 AICAGE_UID="${AICAGE_UID:-0}"
@@ -16,6 +17,7 @@ AICAGE_GID="${AICAGE_GID:-0}"
 AICAGE_HOST_USER="${AICAGE_HOST_USER:-root}"
 AICAGE_HOME="${AICAGE_HOME:-/root}"
 MOUNT_HOME="${AICAGE_MOUNT_HOME:-${AICAGE_HOME}}"
+AICAGE_ALLOW_HOME_MOUNT="${AICAGE_ALLOW_HOME_MOUNT:-}"
 
 is_mountpoint() {
   local path="$1"
@@ -31,8 +33,10 @@ ensure_home_is_not_mounted() {
   current="$path"
   while true; do
     if [ -e "$current" ] && is_mountpoint "$current"; then
-      echo "Refusing to start: home path or parent is a mountpoint: ${current}" >&2
-      exit 1
+      if [[ -z "${AICAGE_ALLOW_HOME_MOUNT}" || "${current}" != "${AICAGE_HOME}" ]]; then
+        echo "Refusing to start: home path or parent is a mountpoint: ${current}" >&2
+        exit 1
+      fi
     fi
     if [ "$current" = "/" ]; then
       break

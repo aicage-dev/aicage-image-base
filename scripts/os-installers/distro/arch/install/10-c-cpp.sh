@@ -10,7 +10,6 @@ pacman -S --noconfirm --needed \
   lldb \
   ltrace \
   ninja \
-  openssl \
   pkgconf \
   strace \
   valgrind \

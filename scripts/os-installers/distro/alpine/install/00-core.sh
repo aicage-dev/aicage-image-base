@@ -17,6 +17,7 @@ apk add --no-cache \
   less \
   nano \
   netcat-openbsd \
+  openssl \
   openssh-client \
   p7zip \
   patch \

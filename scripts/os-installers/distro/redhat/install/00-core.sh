@@ -18,6 +18,7 @@ dnf -y install \
   less \
   nano \
   nmap-ncat \
+  openssl \
   openssh-clients \
   p7zip \
   patch \

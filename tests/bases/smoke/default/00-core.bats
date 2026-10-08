@@ -30,6 +30,7 @@
       command -v less
       command -v nano
       command -v nc
+      openssl version >/dev/null
       command -v ssh
       command -v 7z >/dev/null || command -v 7za >/dev/null
       command -v patch

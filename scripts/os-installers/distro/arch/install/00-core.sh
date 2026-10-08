@@ -17,6 +17,7 @@ pacman -S --noconfirm --needed \
   less \
   nano \
   openbsd-netcat \
+  openssl \
   openssh \
   p7zip \
   patch \

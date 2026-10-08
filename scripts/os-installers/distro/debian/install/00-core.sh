@@ -17,6 +17,7 @@ apt-get install -y --no-install-recommends \
   less \
   nano \
   netcat-openbsd \
+  openssl \
   openssh-client \
   p7zip-full \
   patch \

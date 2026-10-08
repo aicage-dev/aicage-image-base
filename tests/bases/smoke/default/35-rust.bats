@@ -36,11 +36,24 @@
     -lc '
       set -euo pipefail
       test "${RUSTUP_HOME}" = "/usr/local/rustup"
-      [[ ":${PATH}:" == *":/usr/local/cargo/bin:"* ]]
-      [[ ":${PATH}:" == *":${HOME}/.cargo/bin:"* ]]
+      test "$(command -v cargo)" = "/usr/local/bin/cargo"
+      test "$(command -v rustc)" = "/usr/local/bin/rustc"
+      test "$(command -v rustfmt)" = "/usr/local/bin/rustfmt"
       rustup show active-toolchain >/dev/null
       cargo -V >/dev/null
       rustc -V >/dev/null
+      rustfmt -V >/dev/null
+      cargo clippy -V >/dev/null
+
+      cargo new --quiet /tmp/rust-login-smoke
+      cat >/tmp/rust-login-smoke/src/main.rs <<'EOF'
+fn main() {
+    println!("ok-rust");
+}
+EOF
+      rustfmt /tmp/rust-login-smoke/src/main.rs
+      cd /tmp/rust-login-smoke
+      cargo run --quiet | grep -qx ok-rust
     '
   [ "$status" -eq 0 ]
 }

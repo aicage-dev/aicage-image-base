@@ -54,5 +54,7 @@ curl_wrapper https://raw.githubusercontent.com/rust-lang/rustup/master/LICENSE-M
 
 cat >/etc/profile.d/rust.sh <<'RUST'
 export RUSTUP_HOME=/usr/local/rustup
-export PATH="/usr/local/cargo/bin:$HOME/.cargo/bin:$PATH"
+# Prefer the installed toolchain binaries over rustup shims in the shared,
+# root-owned CARGO_HOME and in the runtime user's home.
+export PATH="/usr/local/bin:$HOME/.cargo/bin:/usr/local/cargo/bin:$PATH"
 RUST

@@ -30,7 +30,7 @@ permissions:
 jobs:
   prepare-retention-regex:
     name: Prepare retention regex
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     outputs:
       package_name: ${{ steps.config.outputs.package_name }}
       exclude_tags_regex: ${{ steps.regex.outputs.exclude_tags_regex }}
@@ -118,7 +118,7 @@ jobs:
   ghcr-cleanup:
     name: GHCR cleanup
     needs: prepare-retention-regex
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       packages: write
     steps:

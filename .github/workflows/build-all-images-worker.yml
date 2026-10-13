@@ -24,7 +24,7 @@ jobs:
 
   matrix:
     name: Build matrix for ${{ github.ref_name }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     env:
       INPUT_BASE: ${{ github.event.inputs.base }}
       ROOT_DIR: ${{ github.workspace }}

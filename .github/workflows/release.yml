@@ -12,7 +12,7 @@ permissions:
 jobs:
 
   verify-tagged-commit:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
@@ -41,7 +41,7 @@ jobs:
     uses: ./.github/workflows/build-all-images-worker.yml
 
   release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: [build-images, verify-tagged-commit]
     permissions:
       contents: write

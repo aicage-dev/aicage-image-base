@@ -31,7 +31,7 @@ load_config_file() {
     if [[ -z ${!key+x} ]]; then
       export "${key}=${value}"
     fi
-  done < <(yq -er 'to_entries[] | [.key, (.value // "")] | @tsv' "${config_file}")
+  done < <(yq -ber 'to_entries[] | [.key, (.value // "")] | @tsv' "${config_file}")
 }
 
 _get_github_repository_url() {
@@ -71,7 +71,7 @@ _read_yaml_field() {
   [[ -d "${base_dir}" ]] || _die "Base alias '${alias}' not found under ${BASE_DEFINITIONS_DIR}"
   [[ -f "${definition_file}" ]] || _die "Missing ${definition_filename} for '${alias}'"
 
-  value="$(yq -er ".${field}" "${definition_file}")" || _die "Failed to read ${field} from ${definition_file}"
+  value="$(yq -ber ".${field}" "${definition_file}")" || _die "Failed to read ${field} from ${definition_file}"
   [[ -n "${value}" && "${value}" != "null" ]] || _die "${field} missing in ${definition_file}"
   printf '%s\n' "${value}"
 }
@@ -95,7 +95,7 @@ get_base_list_field() {
 
   [[ -f "${definition_file}" ]] || _die "Missing base.yml for '${alias}'"
 
-  yq -r ".${field} // [] | .[]" "${definition_file}" ||
+  yq -br ".${field} // [] | .[]" "${definition_file}" ||
     _die "Failed to read ${field} from ${definition_file}"
 }
 

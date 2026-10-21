@@ -10,7 +10,6 @@ permissions:
 
 jobs:
   lint:
-    name: Lint for ${{ github.ref_name }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

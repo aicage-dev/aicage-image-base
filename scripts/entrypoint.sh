@@ -137,7 +137,7 @@ filter_nested_mount_points() {
       if [[ "${i}" -eq "${j}" ]]; then
         continue
       fi
-      if [[ "${mount_points[i]}" == "${mount_points[j]}"* ]]; then
+      if [[ "${mount_points[j]}" == */ && "${mount_points[i]}" == "${mount_points[j]}"* ]]; then
         is_nested=1
         break
       fi

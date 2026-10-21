@@ -42,16 +42,19 @@ cleanup_mount_dir() {
   [[ "$output" == *"file-data"* ]]
 }
 
-@test "home file mount on non-linux host is directly available in AICAGE_HOME" {
+@test "home file mounts with shared prefixes on non-linux host are available in AICAGE_HOME" {
   host_dir="$(mktemp -d)"
   trap 'cleanup_mount_dir "${host_dir}"' RETURN
   chmod 755 "${host_dir}"
   printf 'file-data\n' >"${host_dir}/.aicage-test-file"
+  printf 'backup-data\n' >"${host_dir}/.aicage-test-file.backup"
   chmod 644 "${host_dir}/.aicage-test-file"
+  chmod 644 "${host_dir}/.aicage-test-file.backup"
 
   run docker run --rm \
     --env AICAGE_WORKSPACE=/workspace \
     -v "${host_dir}/.aicage-test-file:/mnt/d/Users/hoster/.aicage-test-file:ro" \
+    -v "${host_dir}/.aicage-test-file.backup:/mnt/d/Users/hoster/.aicage-test-file.backup:ro" \
     --env AICAGE_UID=0 \
     --env AICAGE_GID=0 \
     --env AICAGE_HOST_USER=root \
@@ -61,12 +64,16 @@ cleanup_mount_dir() {
     -c '
       set -euo pipefail
       [[ -L /root/.aicage-test-file ]]
+      [[ -L /root/.aicage-test-file.backup ]]
       [[ $(readlink -f /root/.aicage-test-file) == "/mnt/d/Users/hoster/.aicage-test-file" ]]
+      [[ $(readlink -f /root/.aicage-test-file.backup) == "/mnt/d/Users/hoster/.aicage-test-file.backup" ]]
       [[ ! -L "${AICAGE_MOUNT_HOME}/.aicage-test-file" ]]
       cat /root/.aicage-test-file
+      cat /root/.aicage-test-file.backup
     '
   [ "$status" -eq 0 ]
   [[ "$output" == *"file-data"* ]]
+  [[ "$output" == *"backup-data"* ]]
 }
 
 @test "home file mount on non-linux host replaces existing /root file" {

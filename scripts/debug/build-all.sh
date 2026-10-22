@@ -54,5 +54,5 @@ while IFS= read -r BASE_ALIAS; do
   [[ -n "${BASE_ALIAS}" ]] || continue
   FROM_IMAGE="$(get_base_field "${BASE_ALIAS}" from_image)"
   echo "[build-base-all] Building ${BASE_ALIAS} (upstream: ${FROM_IMAGE}" >&2
-  "${ROOT_DIR}/scripts/util/build.sh" --base "${BASE_ALIAS}" --version "${AICAGE_VERSION}"
+  "${ROOT_DIR}/scripts/debug/build.sh" --base "${BASE_ALIAS}" --version "${AICAGE_VERSION}"
 done < <(list_configured_bases)

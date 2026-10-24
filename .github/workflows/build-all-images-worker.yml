@@ -19,9 +19,6 @@ permissions:
   actions: read
 
 jobs:
-  lint:
-    uses: ./.github/workflows/lint.yml
-
   matrix:
     name: Build matrix for ${{ github.ref_name }}
     runs-on: ubuntu-latest
@@ -74,7 +71,7 @@ jobs:
 
   build:
     name: Build ${{ matrix.base }} for ${{ github.ref_name }}
-    needs: [lint, matrix]
+    needs: matrix
     permissions:
       contents: read
       actions: read

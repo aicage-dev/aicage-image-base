@@ -2,11 +2,12 @@ name: Change Validation
 run-name: Change validation (${{ github.ref_name }})
 
 "on":
-  pull_request: {}
+  pull_request:
   push:
     branches:
       - main
-  workflow_dispatch: {}
+  workflow_call:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -14,3 +15,18 @@ permissions:
 jobs:
   lint:
     uses: ./.github/workflows/lint.yml
+
+  required-status-checks:
+    name: "Required Status Checks"  # do not change, used in ruleset "Required Status Checks"
+    if: ${{ always() }}
+    needs:
+      - lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check validation job results
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: |
+          jq --exit-status \
+            'all(.[]; .result == "success" or .result == "skipped")' \
+            <<< "$NEEDS"

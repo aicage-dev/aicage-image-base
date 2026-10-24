@@ -11,7 +11,7 @@ run-name: Build all base images (${{ github.ref_name }})
         type: string
 
 concurrency:
-  group: build-base-images-${{ github.run_id }}
+  group: ${{ github.workflow_ref }}-${{ github.run_id }}
   cancel-in-progress: false
 
 permissions:

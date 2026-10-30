@@ -48,6 +48,22 @@ install_node_from_tarball() {
   ln -sf /usr/local/bin/npx /usr/bin/npx
 }
 
+# libatomic: required by the downloaded Node binary
+# xdg-utils: provides xdg-open; needed by some npm-installed CLI agents (auth/docs URL open)
+if command -v apt-get >/dev/null 2>&1; then
+  apt-get update && apt-get install -y --no-install-recommends libatomic1 xdg-utils
+elif command -v dnf >/dev/null 2>&1; then
+  dnf install -y libatomic xdg-utils
+elif command -v yum >/dev/null 2>&1; then
+  yum install -y libatomic xdg-utils
+elif command -v zypper >/dev/null 2>&1; then
+  zypper -n in libatomic1 xdg-utils
+elif command -v pacman >/dev/null 2>&1; then
+  pacman -Sy --noconfirm gcc-libs xdg-utils
+elif command -v apk >/dev/null 2>&1; then
+  apk add --no-cache xdg-utils
+fi
+
 if command -v apk >/dev/null 2>&1; then
   # Prefer distro packages on Alpine to avoid missing musl tarballs.
   apk add --no-cache \
@@ -61,23 +77,6 @@ npm config set prefix /usr/local
 
 npm install -g corepack
 corepack enable
-
-# xdg-utils: provides xdg-open; needed by some npm-installed CLI agents (auth/docs URL open)
-if ! command -v xdg-open >/dev/null 2>&1; then
-  if command -v apt-get >/dev/null 2>&1; then
-    apt-get update && apt-get install -y --no-install-recommends xdg-utils
-  elif command -v dnf >/dev/null 2>&1; then
-    dnf install -y xdg-utils
-  elif command -v yum >/dev/null 2>&1; then
-    yum install -y xdg-utils
-  elif command -v zypper >/dev/null 2>&1; then
-    zypper -n in xdg-utils
-  elif command -v pacman >/dev/null 2>&1; then
-    pacman -Sy --noconfirm xdg-utils
-  elif command -v apk >/dev/null 2>&1; then
-    apk add --no-cache xdg-utils
-  fi
-fi
 
 # cleanup
 npm cache clean --force

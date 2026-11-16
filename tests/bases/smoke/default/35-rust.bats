@@ -46,7 +46,7 @@
       cargo clippy -V >/dev/null
 
       cargo new --quiet /tmp/rust-login-smoke
-      cat >/tmp/rust-login-smoke/src/main.rs <<'EOF'
+      cat >/tmp/rust-login-smoke/src/main.rs <<'"'"'EOF'"'"'
 fn main() {
     println!("ok-rust");
 }

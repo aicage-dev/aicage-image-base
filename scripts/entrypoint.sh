@@ -78,6 +78,26 @@ set_target_env() {
   export PATH="${HOME}/.local/bin:${PATH}"
 }
 
+setup_gnupg_staging() {
+  local staging_home="/run/aicage/gnupg-staging"
+  local target_home="${AICAGE_HOME}/.gnupg"
+  local filesystem_type
+
+  [ -d "${staging_home}" ] || return 0
+  [ ! -e "${target_home}" ] && [ ! -L "${target_home}" ] || return 0
+
+  filesystem_type="$(stat -f -c %T "${staging_home}")"
+  if [ "${filesystem_type}" != "UNKNOWN" ]; then
+    ln -s "${staging_home}" "${target_home}"
+    return 0
+  fi
+
+  mkdir -m 700 "${target_home}"
+  cp -a "${staging_home}/." "${target_home}/"
+  chown -hR "${AICAGE_UID}:${AICAGE_GID}" "${target_home}" 2>/dev/null || \
+    chown -R "${AICAGE_UID}:${AICAGE_GID}" "${target_home}"
+}
+
 apply_timezone() {
   local timezone="${TZ:-}"
   local zoneinfo_path
@@ -309,6 +329,7 @@ fi
 mirror_windows_home_mounts_to_root
 apply_timezone
 set_target_env "${AICAGE_HOME}" "${AICAGE_HOST_USER}"
+setup_gnupg_staging
 
 if [[ ! -e "${AICAGE_WORKSPACE}" ]]; then
   mkdir -p "${AICAGE_WORKSPACE}"

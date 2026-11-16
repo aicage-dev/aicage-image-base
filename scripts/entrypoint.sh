@@ -94,7 +94,7 @@ setup_gnupg_staging() {
 
   mkdir -m 700 "${target_home}"
   cp -a "${staging_home}/." "${target_home}/"
-  chown -hR "${AICAGE_UID}:${AICAGE_GID}" "${target_home}" 2>/dev/null || \
+  chown -hR "${AICAGE_UID}:${AICAGE_GID}" "${target_home}" 2>/dev/null ||
     chown -R "${AICAGE_UID}:${AICAGE_GID}" "${target_home}"
 }
 

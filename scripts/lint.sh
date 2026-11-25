@@ -55,14 +55,17 @@ if [[ ${#bats_scripts[@]} -gt 0 ]]; then
 fi
 
 # Schemas
+echo "Validate config.yml file with schema"
 check-jsonschema \
   --schemafile validation/config.schema.json \
   config.yml
 
+echo "Validate base.yml files with schema"
 check-jsonschema \
   --schemafile validation/base.schema.json \
-  bases/*/base.yml
+  bases/*/base.y*ml
 
+echo "Validate base-build.yml files with schema"
 check-jsonschema \
   --schemafile validation/base-build.schema.json \
-  bases/*/base-build.yml
+  bases/*/base-build.y*ml

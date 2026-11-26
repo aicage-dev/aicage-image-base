@@ -25,7 +25,7 @@ cleanup_mount_dir() {
 
   run docker run --rm \
     --env AICAGE_WORKSPACE=/workspace \
-    -v "${staging_dir}:/run/aicage/gnupg-staging:ro" \
+    -v "${staging_dir}:/run/aicage/gnupg-staging:rw" \
     --env AICAGE_UID=0 \
     --env AICAGE_GID=0 \
     --env AICAGE_HOST_USER=root \
@@ -43,6 +43,7 @@ cleanup_mount_dir() {
         [[ $(readlink "${target_home}") == /run/aicage/gnupg-staging ]]
       fi
       [[ $(cat "${target_home}/pubring.kbx") == public-data ]]
+      [[ $(readlink "${target_home}/S.gpg-agent") == /run/aicage/gnupg-socket/S.gpg-agent ]]
     '
   [ "$status" -eq 0 ]
 }

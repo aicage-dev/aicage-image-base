@@ -80,11 +80,14 @@ set_target_env() {
 
 setup_gnupg_staging() {
   local staging_home="/run/aicage/gnupg-staging"
+  local agent_socket="/run/aicage/gnupg-socket/S.gpg-agent"
   local target_home="${AICAGE_HOME}/.gnupg"
   local filesystem_type
 
   [ -d "${staging_home}" ] || return 0
   [ ! -e "${target_home}" ] && [ ! -L "${target_home}" ] || return 0
+
+  ln -s "${agent_socket}" "${staging_home}/S.gpg-agent"
 
   filesystem_type="$(stat -f -c %T "${staging_home}")"
   if [ "${filesystem_type}" != "UNKNOWN" ]; then

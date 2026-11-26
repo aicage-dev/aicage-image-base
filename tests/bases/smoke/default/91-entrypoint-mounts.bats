@@ -17,6 +17,64 @@ cleanup_mount_dir() {
   rm -rf "${dir}" >/dev/null 2>&1 || true
 }
 
+@test "entrypoint initializes GnuPG home from staging" {
+  staging_dir="$(mktemp -d)"
+  trap 'cleanup_mount_dir "${staging_dir}"' RETURN
+  chmod 700 "${staging_dir}"
+  printf 'public-data\n' >"${staging_dir}/pubring.kbx"
+
+  run docker run --rm \
+    --env AICAGE_WORKSPACE=/workspace \
+    -v "${staging_dir}:/run/aicage/gnupg-staging:rw" \
+    --env AICAGE_UID=0 \
+    --env AICAGE_GID=0 \
+    --env AICAGE_HOST_USER=root \
+    --env AICAGE_HOME=/root \
+    "${AICAGE_IMAGE_BASE_IMAGE}" \
+    -c '
+      set -euo pipefail
+      target_home=/root/.gnupg
+      if [[ $(stat -f -c %T /run/aicage/gnupg-staging) == UNKNOWN ]]; then
+        [[ -d "${target_home}" ]]
+        [[ ! -L "${target_home}" ]]
+        [[ $(stat -c %a "${target_home}") == 700 ]]
+      else
+        [[ -L "${target_home}" ]]
+        [[ $(readlink "${target_home}") == /run/aicage/gnupg-staging ]]
+      fi
+      [[ $(cat "${target_home}/pubring.kbx") == public-data ]]
+      [[ $(readlink "${target_home}/S.gpg-agent") == /run/aicage/gnupg-socket/S.gpg-agent ]]
+    '
+  [ "$status" -eq 0 ]
+}
+
+@test "entrypoint preserves an existing GnuPG home" {
+  staging_dir="$(mktemp -d)"
+  trap 'cleanup_mount_dir "${staging_dir}"' RETURN
+  printf 'staged-data\n' >"${staging_dir}/pubring.kbx"
+
+  run docker run --rm \
+    --entrypoint /bin/bash \
+    --env AICAGE_WORKSPACE=/workspace \
+    -v "${staging_dir}:/run/aicage/gnupg-staging:ro" \
+    --env AICAGE_UID=0 \
+    --env AICAGE_GID=0 \
+    --env AICAGE_HOST_USER=root \
+    --env AICAGE_HOME=/root \
+    "${AICAGE_IMAGE_BASE_IMAGE}" \
+    -c '
+      set -euo pipefail
+      mkdir -m 700 /root/.gnupg
+      printf existing-data > /root/.gnupg/sentinel
+      /usr/local/bin/entrypoint.sh -c "
+        [[ ! -L /root/.gnupg ]]
+        [[ \$(cat /root/.gnupg/sentinel) == existing-data ]]
+        [[ ! -e /root/.gnupg/pubring.kbx ]]
+      "
+    '
+  [ "$status" -eq 0 ]
+}
+
 @test "home file mount is directly available in AICAGE_HOME" {
   host_dir="$(mktemp -d)"
   trap 'cleanup_mount_dir "${host_dir}"' RETURN
